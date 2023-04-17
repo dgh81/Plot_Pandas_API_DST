@@ -75,7 +75,8 @@ for index,field in enumerate(myData):
             y.append(float(xList[2].replace(',','.')))
             plt.barh(x, y,color='#0000FF')
             # print(f"{os.path.join(os.getcwd())}\\img{index}.png")
-            save_img_path = f"img{index}.png"
+            # [f"{i:03}" for i in range(121)]
+            save_img_path = f"img{index:03}.png"
             plt.savefig(save_img_path)
             # pause = animation - se: https://www.youtube.com/watch?v=7RgoHTMbp4A&ab_channel=NeuralNine
             plt.pause(0.1)

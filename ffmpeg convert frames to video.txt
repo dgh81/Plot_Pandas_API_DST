@@ -1,3 +1,17 @@
-ffmpeg -framerate 1 -pattern_type sequence -i C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img%1d.jpg -s:v 1920x1080 -c:v libx264 -pix_fmt yuv420p C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\out.mp4
+ffmpeg -framerate 2 -pattern_type sequence -i C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img%3d.png -s:v 1920x1080 -c:v libx264 -pix_fmt yuv420p C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\out1.mp4
+
+img%3d.png = img001.png, img002.png etc.
+
+-c = codec
+-c:v = codec video
+-s:v = save video
+(kan udelades fra ovenstående string)
+
+framerate sætter hastigheden!
 
 (virker både med png og jpg)
+
+test om man kan installere "glob" på windows. Documentation fra ffmpeg:
+(https://ffmpeg.org/ffmpeg.html#Video-Options)
+"For example, for creating a video from filenames matching the glob pattern foo-*.jpeg:
+ffmpeg -f image2 -pattern_type glob -framerate 12 -i 'foo-*.jpeg' -s WxH foo.avi"
