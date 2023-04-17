@@ -72,7 +72,10 @@ for index,field in enumerate(myData):
             # print('new xList: ',xList[0])
             year.append(xList[1])
             y.append(float(xList[2].replace(',','.')))
-   
+            plt.barh(x, y,color='#0000FF')
+            # pause = animation - se: https://www.youtube.com/watch?v=7RgoHTMbp4A&ab_channel=NeuralNine
+            plt.pause(0.1)
+
 
 print('x: ',x)
 print('year: ', year)
@@ -86,7 +89,7 @@ print('y: ',y)
 # plt.bar(x, y,color='#0000FF',label='Gennemsnitsalder')
 
 #barh = liggende søjler
-plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
+# plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
 
 plt.xlabel('x-akse', fontsize='small') #hvorfor virker fontsize ikke? tjek version af pyplot...
 plt.xticks(rotation=90)
