@@ -1,0 +1,1 @@
+ffmpeg -framerate 1 -pattern_type sequence -i C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img%1d.jpg -s:v 1920x1080 -c:v libx264 -pix_fmt yuv420p C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\out.mp4

@@ -5,6 +5,7 @@ from api import result
 # pip install matplotlib
 
 from matplotlib import pyplot as plt
+import os
 #--------------------------------------------------------------------------------------
 # # vis indbyggede styles:
 # # print(plt.style.available)
@@ -59,7 +60,7 @@ myData = result.text.split(";")
 myData = result.text.split("\r\n")
 
 for index,field in enumerate(myData):
-    if index < 20:
+    if index < 10:
         # print(field.split(";"))
         xList = field.split(";")
         # print('xList', xList)
@@ -73,6 +74,9 @@ for index,field in enumerate(myData):
             year.append(xList[1])
             y.append(float(xList[2].replace(',','.')))
             plt.barh(x, y,color='#0000FF')
+            # print(f"{os.path.join(os.getcwd())}\\img{index}.png")
+            save_img_path = f"img{index}.jpg"
+            plt.savefig(save_img_path)
             # pause = animation - se: https://www.youtube.com/watch?v=7RgoHTMbp4A&ab_channel=NeuralNine
             plt.pause(0.1)
 
@@ -99,6 +103,8 @@ plt.xticks(rotation=90)
 
 plt.title('Mit diagram')
 
+#No artists with labels found to put in legend.
+#Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
 plt.legend()
 
 plt.show()
