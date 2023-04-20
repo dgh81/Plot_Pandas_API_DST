@@ -1,3 +1,4 @@
+from api import subjects
 import tkinter as tk
 from tkinter import ttk
 
@@ -65,6 +66,18 @@ class Page_1_Content(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         ttk.Label(self, text="test1", background="purple").pack(side=tk.LEFT, padx=10)
+
+        fm = ttk.Frame(self)
+        fm.pack()
+        self.columnconfigure(0, weight=1)
+        subjects_tuple = tuple(range(len(subjects)))
+        self.rowconfigure(subjects_tuple, weight=1)
+
+        for index, sub in enumerate(subjects):
+            t = sub['description']          
+            sub_button = ttk.Button(fm, text=t, command=lambda callback=sub: select_subject(callback))
+            sub_button.grid(row=index, column=0, sticky='nsew')
+
         self.pack()
 
 class Page_2_Content(ttk.Frame):
@@ -72,5 +85,12 @@ class Page_2_Content(ttk.Frame):
         super().__init__(parent)
         ttk.Label(self, text="test2", background="orange").pack(side=tk.LEFT, padx=10)
         self.pack()
+
+def select_subject(sub):
+    print(sub)
+    print(sub['id'])
+    # print(sub["subjects"])
+
+
 
 App(title='Project', geometry=(600,600))
