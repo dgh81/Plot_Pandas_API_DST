@@ -119,60 +119,97 @@ def get_subject(subjectID):
 # get_subject(2)
 
 
-def get_table_name():
+def get_table_name(table_id):
     payload_get_table_name = {
         "subjects": [
-            "3542"
+            f"{table_id}"
         ]
     }
     rr = requests.post('https://api.statbank.dk/v1/tables', data=payload_get_table_name).json()
     for table in rr:
         pass
-        # print(table)
-        # print(table['id'], table['variables'])
+        print(table)
+        print(table['id'], table['variables'])
+    return table['id']
+    
 
-get_table_name()
+# get_table_name()
 
-def get_table_metadata():
+# def get_table_metadata(table_name):
+#     payload = {
+#     "table": f"{table_name}",
+#     "format": "JSON"
+#     }
+#     result = requests.post('https://api.statbank.dk/v1/tableinfo', json=payload).json()
+#     vars = []
+#     try:
+#         for meta in result['variables']:
+#             print(meta['id'])
+#             vars.append(meta["id"])
+#             for val in meta["values"]:
+#                 print(val)
+#                 pass
+        
+#     except:
+#         pass
+#     return vars
+
+def get_table_metadata_field_types(table_name, field_id):
     payload = {
-    "table": "formue11",
+    "table": f"{table_name}",
     "format": "JSON"
     }
     result = requests.post('https://api.statbank.dk/v1/tableinfo', json=payload).json()
-    for meta in result['variables']:
-        print(meta['id'])
-        for val in meta["values"]:
-            print(val)
-            pass
-    
+    table_field_types = []
+    # print(result['variables'][0])
+    try:
+        for meta in result['variables']:
+            # print(meta['id'])
+            table_field_types.append(meta['id'])
+            # for val in meta["values"]:                
+            #     table_field_types.append(val)
+    except:
+        pass
+    print(len(table_field_types))
+    # return table_field_types
+    return result['variables'][int(f"{field_id}")]['values']
 
-
-get_table_metadata()
-
-def get_table_data():
+def get_table_metadata_fields(table_name):
     payload = {
-        "table": "FORMUE11",
+    "table": f"{table_name}",
+    "format": "JSON"
+    }
+    result = requests.post('https://api.statbank.dk/v1/tableinfo', json=payload).json()
+    table_fields = []
+    try:
+        for meta in result['variables']:
+            print(meta['id'])
+            table_fields.append(meta["id"])
+            # for val in meta["values"]:
+            #     print(val)
+            #     pass
+    except:
+        pass
+    return table_fields
+# get_table_metadata()
+
+#TODO: Denne skal bruge args som nr 2 argument, hvori variables bor, json herunder skal skabes dynamisk...
+def get_table_data(table_name):
+    payload = {
+        "table": f"{table_name}",
         "format": "CSV",
         "variables": [
             {
-                "code": "FORM1",
-                "values": ["FGNF2020"]
+                "code": "BRANCHE07",
+                "values": ["CG"]
             },
             {
-                "code": "ENHED",
-                "values": ["200"]
+                "code": "OMSTYPE",
+                "values": ["SAMLET"]
             },
             {
-                "code": "ALDER",
-                "values": ["2529"]
-            },
-            {
-                "code": "POPU",
-                "values": ["5005"]
-            },
-            {
-                "code": "KØN",
-                "values": "MOK"
+                "code": "Tid",
+                "values": ["*"]
             }
         ],
 
@@ -181,6 +218,6 @@ def get_table_data():
     result = result.text
     # print(result)
 
-    # print(result.content)
+    print(result)
 
-get_table_data()
+# get_table_data()
