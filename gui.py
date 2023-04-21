@@ -87,15 +87,17 @@ class Page_1_Content(ttk.Frame):
         
         # LEVEL 1 FRAME:
         frame_1 = self.create_level_1_frame()
-        self.buttons = {}
+        self.level_1_buttons = {}
         for index, sub in enumerate(subjects):
             btn_text = sub['description']          
             sub_button = tk.Button(frame_1, text=btn_text, command=lambda callback=sub, callback2=index: self.level_1_click(callback, callback2))
             sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
-            self.buttons[index] = sub_button
+            self.level_1_buttons[index] = sub_button
         
         # LEVEL 2 AND 3 FRAME:
+        self.level_2_buttons = {}
         self.create_level_2_frame()
+        self.level_3_buttons = {}
         self.create_level_3_frame()
 
         self.pack(fill='both', expand=True)
@@ -122,12 +124,12 @@ class Page_1_Content(ttk.Frame):
         subjects_tuple = tuple(range(20))
         self.frame_3.rowconfigure(subjects_tuple, weight=1)
 
-    def clear_level_1_button_colors(self, index):
+    def set_level_1_button_colors(self, index):
         # Button color reset and set clicked:
-        for i in range(len(self.buttons)):
-            print(self.buttons[i]['bg'])
-            self.buttons[i].configure(bg='SystemButtonFace')
-        self.buttons[index].configure(bg='teal')
+        for i in range(len(self.level_1_buttons)):
+            print(self.level_1_buttons[i]['bg'])
+            self.level_1_buttons[i].configure(bg='SystemButtonFace')
+        self.level_1_buttons[index].configure(bg='teal')
     
     def clear_level_2_and_3_buttons(self):
         for i in range(20):
@@ -146,11 +148,13 @@ class Page_1_Content(ttk.Frame):
         for level_2_subjects in subs:
             for index, level_2_subject in enumerate(level_2_subjects['subjects']):
                 btn_text = level_2_subject['description']
-                sub_button = tk.Button(self.frame_2, text=btn_text, command=lambda callback=level_2_subject: self.level_2_click(callback))
+                sub_button = tk.Button(self.frame_2, text=btn_text, command=lambda callback=level_2_subject, callback2=index: self.level_2_click(callback, callback2))
                 sub_button.grid(row=index, column=0, sticky='nsew')
+                self.level_2_buttons[index] = sub_button
+
 
     def level_1_click(self, sub, index):
-        self.clear_level_1_button_colors(index)
+        self.set_level_1_button_colors(index)
         self.clear_level_2_and_3_buttons()
         self.create_level_2_buttons(sub,index)
 
@@ -168,15 +172,35 @@ class Page_1_Content(ttk.Frame):
             print("empty!","Using level 2 code:",level_3_subjects[0]['id'])
         for index, level_3_subject in enumerate(level_3_subjects[0]['subjects']):
             btn_text = level_3_subject['description']
-            sub_button = tk.Button(self.frame_3, text=btn_text, command=lambda callback=level_3_subject: self.temp(callback))
+            sub_button = tk.Button(self.frame_3, text=btn_text, command=lambda callback=level_3_subject, callback2=index: self.temp(callback, callback2))
             sub_button.grid(row=index, column=0, sticky='nsew')
+            self.level_3_buttons[index] = sub_button
+    
+    def set_level_2_button_colors(self, index):
+        # Button color reset and set clicked:
+        print(index)
+        for i in range(len(self.level_2_buttons)):
+            print(self.level_2_buttons[i]['bg'])
+            self.level_2_buttons[i].configure(bg='SystemButtonFace')
+        self.level_2_buttons[index].configure(bg='red')
 
-    def level_2_click(self, level_2_sub):
+    def level_2_click(self, level_2_sub, index):
+        self.set_level_2_button_colors(index)
         self.clear_level_3_buttons()
         self.create_level_3_buttons(level_2_sub)
 
-    def temp(self, level_3_sub):
+    def set_level_3_button_colors(self, index):
+        # Button color reset and set clicked:
+        print(index)
+        for i in range(len(self.level_3_buttons)):
+            print(self.level_3_buttons[i]['bg'])
+            self.level_3_buttons[i].configure(bg='SystemButtonFace')
+        self.level_3_buttons[index].configure(bg='orange')
+
+    def temp(self, level_3_sub, index):
+
         print(level_3_sub['id'])
+        self.set_level_3_button_colors(index)
 
 
 class Page_2_Content(ttk.Frame):
