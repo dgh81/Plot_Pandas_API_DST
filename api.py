@@ -103,22 +103,20 @@ for sub in subjects:
             #TODO mangler et lag sunjects mere...
             #TDO Nej tag eet lag ad gangen
 
-payload_get_subject = {
-    "subjects": [
-        "2",
-        "3429",
-        "20318"
-    ],
-    "pastdays": 1,
-    "includeinactive": "true"
-}
+
 
 # def get_subject(subjectID):
-def get_subject():
+def get_subject(subjectID):
+    payload_get_subject = {
+        "subjects": [
+            f"{subjectID}"
+        ]
+    }
     rr = requests.post('https://api.statbank.dk/v1/subjects', data=payload_get_subject).json()
-    # print(rr)
+    # print('rr:', rr)
+    return rr
 
-get_subject()
+# get_subject(2)
 
 
 def get_table_name():
@@ -145,6 +143,7 @@ def get_table_metadata():
         print(meta['id'])
         for val in meta["values"]:
             print(val)
+            pass
     
 
 
@@ -180,7 +179,8 @@ def get_table_data():
     }
     result = requests.post('https://api.statbank.dk/v1/data/', json=payload)
     result = result.text
-    print(result)
+    # print(result)
+
     # print(result.content)
 
 get_table_data()

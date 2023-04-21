@@ -1,6 +1,11 @@
 from api import subjects
+from api import get_subject
+
 import tkinter as tk
 from tkinter import ttk
+import functools
+
+test = False
 
 class App(tk.Tk):
     def __init__(self, title, geometry):
@@ -16,7 +21,7 @@ class App(tk.Tk):
         self.pages = []
         p1 = Page(self, "page 1")
         Page_1_Content(p1)
-        p1.pack(pady=100) # Vis side 1:
+        p1.pack(pady=100, fill='both', expand=True) # Vis side 1:
         self.add_page(p1)
 
         p2 = Page(self, "page 2")
@@ -39,7 +44,7 @@ class App(tk.Tk):
                 page.pack_forget()
             self.count_pages += 1
             page = self.pages[self.count_pages]
-            page.pack(pady=100)
+            page.pack(pady=100, fill='both', expand=True)
 
     def move_back_page(self):
         if not self.count_pages == 0:
@@ -47,7 +52,7 @@ class App(tk.Tk):
                 page.pack_forget()
             self.count_pages -= 1
             page = self.pages[self.count_pages]
-            page.pack(pady=100)
+            page.pack(pady=100, fill='both', expand=True)
 
 class Page(ttk.Frame):
     def __init__(self, parent, title_text):
@@ -65,20 +70,104 @@ class Footer(ttk.Frame):
 class Page_1_Content(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        ttk.Label(self, text="test1", background="purple").pack(side=tk.LEFT, padx=10)
+        ttk.Label(self, text="page 1", background="purple").pack(side=tk.TOP, padx=10, fill='both', expand=True)
 
-        fm = ttk.Frame(self)
-        fm.pack()
-        self.columnconfigure(0, weight=1)
+        # Styles
+        style = ttk.Style()
+        style.configure('TFrame', background="red")
+        style.configure('Frame1.TFrame', background="blue")
+        style.configure('Frame2.TFrame', background="orange")
+        style.configure('Frame3.TFrame', background="green")
+
+        # LEVEL 1:
+        self.frame_1 = ttk.Frame(self, width=40, style='Frame1.TFrame')
+        self.frame_1.pack(side='left', fill="both", expand=True)
+        self.frame_1.columnconfigure(0, weight=1)
         subjects_tuple = tuple(range(len(subjects)))
-        self.rowconfigure(subjects_tuple, weight=1)
+        self.frame_1.rowconfigure(subjects_tuple, weight=1)
+
+        # LEVEL 2:
+        self.frame_2 = ttk.Frame(self, width=40, style='Frame2.TFrame')
+        self.frame_2.pack(side='left', fill="both", expand=True)
+        self.frame_2.columnconfigure(0, weight=1)
+        # subjects_tuple = tuple(range(len(subjects)))
+        subjects_tuple = tuple(range(20))
+        self.frame_2.rowconfigure(subjects_tuple, weight=1)
+
+        # LEVEL 3:
+        self.frame_3 = ttk.Frame(self, width=40, style='Frame3.TFrame')
+        self.frame_3.pack(side='left', fill="both", expand=True)
+        self.frame_3.columnconfigure(0, weight=1)
+        # subjects_tuple = tuple(range(len(subjects)))
+        subjects_tuple = tuple(range(20))
+        self.frame_3.rowconfigure(subjects_tuple, weight=1)
 
         for index, sub in enumerate(subjects):
             t = sub['description']          
-            sub_button = ttk.Button(fm, text=t, command=lambda callback=sub: select_subject(callback))
-            sub_button.grid(row=index, column=0, sticky='nsew')
+            sub_button = ttk.Button(self.frame_1, text=t, command=lambda callback=sub: self.populate_level_2_subjects(callback))
+            sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
+        
+        
+        self.pack(fill='both', expand=True)
 
-        self.pack()
+    def populate_level_2_subjects(self, sub):
+        #TODO refactor to func:
+
+        for i in range(20):
+            try:
+                self.frame_2.grid_slaves()[0].destroy()
+                # print("destroy")
+            except:
+                print("failed")
+                
+        
+        for i in range(20):
+            try:
+                self.frame_3.grid_slaves()[0].destroy()
+            except:
+                pass
+
+
+        print(sub['description'])
+        print(sub['id'])
+        subs = get_subject(sub['id'])
+        print(subs)
+        for level_2_subjects in subs:
+            print('i:', level_2_subjects)
+            for index, level_2_subject in enumerate(level_2_subjects['subjects']):
+                print("x:", level_2_subject['id'])
+                # t = level_2_subject['id']
+                t = level_2_subject['description']
+                print(t)
+                sub_button = ttk.Button(self.frame_2, text=t, command=lambda callback=level_2_subject: self.populate_level_3_subjects(callback))
+                sub_button.grid(row=index, column=0, sticky='nsew')
+        test = True
+
+    def populate_level_3_subjects(self, level_2_sub):
+        
+        for i in range(20):
+            try:
+                self.frame_3.grid_slaves()[0].destroy()
+            except:
+                pass
+
+
+        print("test", level_2_sub)
+        subs = get_subject(level_2_sub['id'])
+        print(subs)
+
+        for level_3_subjects in subs:
+            print('i:', level_3_subjects)
+            for index, level_3_subject in enumerate(level_3_subjects['subjects']):
+                print("x:", level_3_subject['id'])
+                # t = level_3_subject['id']
+                t = level_3_subject['description']
+                print(t)
+                sub_button = ttk.Button(self.frame_3, text=t, command=lambda callback=level_3_subject: self.temp(callback))
+                sub_button.grid(row=index, column=0, sticky='nsew')
+
+    def temp(self, level_3_sub):
+        print(level_3_sub['id'])
 
 class Page_2_Content(ttk.Frame):
     def __init__(self, parent):
@@ -86,11 +175,8 @@ class Page_2_Content(ttk.Frame):
         ttk.Label(self, text="test2", background="orange").pack(side=tk.LEFT, padx=10)
         self.pack()
 
-def select_subject(sub):
-    print(sub)
-    print(sub['id'])
-    # print(sub["subjects"])
 
 
 
-App(title='Project', geometry=(600,600))
+
+App(title='Project', geometry=(1200,600))
