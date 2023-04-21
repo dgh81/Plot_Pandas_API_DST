@@ -80,14 +80,14 @@ class Page_1_Content(ttk.Frame):
         style.configure('Frame3.TFrame', background="green")
 
         # LEVEL 1:
-        self.frame_1 = ttk.Frame(self, width=40, style='Frame1.TFrame')
+        self.frame_1 = ttk.Frame(self, style='Frame1.TFrame')
         self.frame_1.pack(side='left', fill="both", expand=True)
         self.frame_1.columnconfigure(0, weight=1)
         subjects_tuple = tuple(range(len(subjects)))
         self.frame_1.rowconfigure(subjects_tuple, weight=1)
 
         # LEVEL 2:
-        self.frame_2 = ttk.Frame(self, width=40, style='Frame2.TFrame')
+        self.frame_2 = ttk.Frame(self, style='Frame2.TFrame')
         self.frame_2.pack(side='left', fill="both", expand=True)
         self.frame_2.columnconfigure(0, weight=1)
         # subjects_tuple = tuple(range(len(subjects)))
@@ -95,31 +95,37 @@ class Page_1_Content(ttk.Frame):
         self.frame_2.rowconfigure(subjects_tuple, weight=1)
 
         # LEVEL 3:
-        self.frame_3 = ttk.Frame(self, width=40, style='Frame3.TFrame')
+        self.frame_3 = ttk.Frame(self, style='Frame3.TFrame')
         self.frame_3.pack(side='left', fill="both", expand=True)
         self.frame_3.columnconfigure(0, weight=1)
         # subjects_tuple = tuple(range(len(subjects)))
         subjects_tuple = tuple(range(20))
         self.frame_3.rowconfigure(subjects_tuple, weight=1)
 
+        self.buttons = {}
+
         for index, sub in enumerate(subjects):
             t = sub['description']          
-            sub_button = ttk.Button(self.frame_1, text=t, command=lambda callback=sub: self.populate_level_2_subjects(callback))
+            sub_button = tk.Button(self.frame_1, text=t, command=lambda callback=sub, callback2=index: self.populate_level_2_subjects(callback, callback2))
             sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
+            self.buttons[index] = sub_button
+
         
         
         self.pack(fill='both', expand=True)
 
-    def populate_level_2_subjects(self, sub):
-        #TODO refactor to func:
+    def populate_level_2_subjects(self, sub, index):
+        # Button color reset and set clicked:
+        for i in range(len(self.buttons)):
+            print(self.buttons[i]['bg'])
+            self.buttons[i].configure(bg='SystemButtonFace')
+        self.buttons[index].configure(bg='teal')
 
         for i in range(20):
             try:
                 self.frame_2.grid_slaves()[0].destroy()
-                # print("destroy")
             except:
-                print("failed")
-                
+                pass
         
         for i in range(20):
             try:
@@ -128,18 +134,18 @@ class Page_1_Content(ttk.Frame):
                 pass
 
 
-        print(sub['description'])
-        print(sub['id'])
+        # print(sub['description'])
+        # print(sub['id'])
         subs = get_subject(sub['id'])
-        print(subs)
+        # print(subs)
         for level_2_subjects in subs:
-            print('i:', level_2_subjects)
+            # print('i:', level_2_subjects)
             for index, level_2_subject in enumerate(level_2_subjects['subjects']):
-                print("x:", level_2_subject['id'])
+                # print("x:", level_2_subject['id'])
                 # t = level_2_subject['id']
                 t = level_2_subject['description']
-                print(t)
-                sub_button = ttk.Button(self.frame_2, text=t, command=lambda callback=level_2_subject: self.populate_level_3_subjects(callback))
+                # print(t)
+                sub_button = tk.Button(self.frame_2, text=t, command=lambda callback=level_2_subject: self.populate_level_3_subjects(callback))
                 sub_button.grid(row=index, column=0, sticky='nsew')
         test = True
 
@@ -152,18 +158,18 @@ class Page_1_Content(ttk.Frame):
                 pass
 
 
-        print("test", level_2_sub)
+        # print("test", level_2_sub)
         subs = get_subject(level_2_sub['id'])
-        print(subs)
+        # print(subs)
 
         for level_3_subjects in subs:
-            print('i:', level_3_subjects)
+            # print('i:', level_3_subjects)
             for index, level_3_subject in enumerate(level_3_subjects['subjects']):
-                print("x:", level_3_subject['id'])
+                # print("x:", level_3_subject['id'])
                 # t = level_3_subject['id']
                 t = level_3_subject['description']
-                print(t)
-                sub_button = ttk.Button(self.frame_3, text=t, command=lambda callback=level_3_subject: self.temp(callback))
+                # print(t)
+                sub_button = tk.Button(self.frame_3, text=t, command=lambda callback=level_3_subject: self.temp(callback))
                 sub_button.grid(row=index, column=0, sticky='nsew')
 
     def temp(self, level_3_sub):
