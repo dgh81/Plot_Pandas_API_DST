@@ -12,6 +12,7 @@ import customtkinter as tk
 from tkinter import ttk
 tk.set_appearance_mode('dark')
 tk.set_default_color_theme('dark-blue')
+
 class App(tk.CTk):
     def __init__(self, title, geometry):
         # App setup
@@ -254,7 +255,7 @@ class Page_1_Content(ttk.Frame):
         
     def level_4_click(self, btn_text, index, table_name):
         print("text", btn_text, 'index',index)
-        
+        #TODO: Viser data, pt for hardcodet tabel.. skal med tiden flyttes til Next-knappen...
         get_table_data(table_name)
 
 # erhverv, industri, industriens salg af varer
@@ -267,4 +268,4 @@ class Page_2_Content(ttk.Frame):
         self.pack()
 
 
-App(title='Project', geometry=(1200,600))
+App(title='Project', geometry=(1600,800))
