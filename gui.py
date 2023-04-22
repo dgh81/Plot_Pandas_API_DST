@@ -15,6 +15,10 @@ from tkinter import ttk
 tk.set_appearance_mode('dark')
 tk.set_default_color_theme('dark-blue')
 
+global_table_name = ''
+final_table_id = None
+# global_selected_level_2_ID = ''
+
 class App(tk.CTk):
     def __init__(self, title, geometry):
         # App setup
@@ -159,43 +163,17 @@ class Page_1_Content(ttk.Frame):
         print(tk.ThemeManager._currently_loaded_theme)
         
         # Button color reset and set clicked:
-        # print('original_fg_color',original_fg_color)
         for i in range(len(self.level_1_buttons)):
-            # print(self.level_1_buttons[i].cget('fg_color')[0])
-            # print(self.level_1_buttons[i].cget('fg_color')[1])
             self.level_1_buttons[i].configure(fg_color='#242424') #3a7ebf
         self.level_1_buttons[index].configure(fg_color='#1f538d') #1f538d
+        global global_table_name
+        global_table_name = self.level_1_buttons[index].cget("text")
+        print(global_table_name)
     
-    #TODO Split i to funks:
-    def clear_level_2_and_3_buttons(self):
-        for i in range(20):
-            try:
-                self.frame_2.grid_slaves()[0].destroy()
-                self.level_2_buttons.clear()
-                # self.frame_2.grid_slaves()[0].pack_forget()
-            except:
-                pass
-        for i in range(20):
-            try:
-                self.frame_3.grid_slaves()[0].destroy()
-                self.level_3_buttons.clear()
-                # self.frame_3.grid_slaves()[0].pack_forget()
-            except:
-                pass
-
-    def create_level_2_buttons(self, sub, index):
-        subs = get_subject(sub['id'])
-        for level_2_subjects in subs:
-            for index, level_2_subject in enumerate(level_2_subjects['subjects']):
-                btn_text = level_2_subject['description']
-                sub_button = tk.CTkButton(self.frame_2, text=btn_text, command=lambda callback=level_2_subject, callback2=index: self.level_2_click(callback, callback2))
-                sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
-                self.level_2_buttons[index] = sub_button
 
 
     def level_1_click(self, sub, index):
         self.set_level_1_button_colors(index)
-        # self.set_level_3_button_colors(index)
         self.clear_level_2_and_3_buttons()
         self.create_level_2_buttons(sub,index)
 
@@ -204,10 +182,47 @@ class Page_1_Content(ttk.Frame):
             try:
                 self.frame_3.grid_slaves()[0].destroy()
                 self.level_3_buttons.clear()
-                #self.frame_3.grid_slaves()[0].pack_forget()
             except:
                 print("fail")
                 pass
+
+    
+    def set_level_2_button_colors(self, index):
+        # Button color reset and set clicked:
+        for i in range(len(self.level_2_buttons)):
+            self.level_2_buttons[i].configure(fg_color='#242424')
+        self.level_2_buttons[index].configure(fg_color='#1f538d')
+
+    #TODO Split i to funks:
+    def clear_level_2_and_3_buttons(self):
+        for i in range(20):
+            try:
+                self.frame_2.grid_slaves()[0].destroy()
+                self.level_2_buttons.clear()
+            except:
+                pass
+        for i in range(20):
+            try:
+                self.frame_3.grid_slaves()[0].destroy()
+                self.level_3_buttons.clear()
+            except:
+                pass
+
+    def create_level_2_buttons(self, sub, index):
+        subs = get_subject(sub['id'])
+        for level_2_subjects in subs:
+            for index, level_2_subject in enumerate(level_2_subjects['subjects']):
+                btn_text = level_2_subject['description']
+                selected_level_2_ID = level_2_subject['id']
+                sub_button = tk.CTkButton(self.frame_2, text=btn_text, command=lambda callback=level_2_subject, callback2=index, callback3=selected_level_2_ID: self.level_2_click(callback, callback2, callback3))
+                sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
+                self.level_2_buttons[index] = sub_button
+
+    def level_2_click(self, level_2_sub, index, selected_level_2_ID):
+        self.set_level_2_button_colors(index)
+        self.clear_level_3_buttons()
+        self.create_level_3_buttons(level_2_sub)
+        print('selected_level_2_ID',selected_level_2_ID)
 
     def create_level_3_buttons(self, level_2_sub):
         level_3_subjects = get_subject(level_2_sub['id'])
@@ -216,23 +231,10 @@ class Page_1_Content(ttk.Frame):
             print("empty!","Using level 2 code:",level_3_subjects[0]['id'])
         for index, level_3_subject in enumerate(level_3_subjects[0]['subjects']):
             btn_text = level_3_subject['description']
-            sub_button = tk.CTkButton(self.frame_3, text=btn_text, command=lambda callback=level_3_subject, callback2=index: self.level_3_click(callback, callback2))
+            selected_level_3_ID = level_3_subject['id']
+            sub_button = tk.CTkButton(self.frame_3, text=btn_text, command=lambda callback=level_3_subject, callback2=index, callback3=selected_level_3_ID: self.level_3_click(callback, callback2, callback3))
             sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
             self.level_3_buttons[index] = sub_button
-    
-    def set_level_2_button_colors(self, index):
-        # Button color reset and set clicked:
-        print(index)
-        # print('fg:', self.level_2_buttons[index].cget('fg_color')[0])
-        # x = self.level_2_buttons[index].cget('fg_color')[0]
-        for i in range(len(self.level_2_buttons)):
-            self.level_2_buttons[i].configure(fg_color='#242424')
-        self.level_2_buttons[index].configure(fg_color='#1f538d')
-
-    def level_2_click(self, level_2_sub, index):
-        self.set_level_2_button_colors(index)
-        self.clear_level_3_buttons()
-        self.create_level_3_buttons(level_2_sub)
 
     def set_level_3_button_colors(self, index):
         # Button color reset and set clicked:
@@ -241,10 +243,16 @@ class Page_1_Content(ttk.Frame):
             self.level_3_buttons[i].configure(fg_color='#242424') # invis:'SystemButtonFace'
         self.level_3_buttons[index].configure(fg_color='#1f538d')
 
-    def level_3_click(self, level_3_sub, index):
+    #TODO: Behøver ikke selected_level_3_ID, selected_level_2_ID, bare det sidste valgte table's id...
+    def level_3_click(self, level_3_sub, index, selected_level_3_ID):
+        
         id = str(level_3_sub['id'])
         print(id)
+        global final_table_id
+        final_table_id = id
+
         self.set_level_3_button_colors(index)
+        #TODO: Brug global_table_name?
         table_name = get_table_name(id)
         print("table name:", table_name)
         print('get_table_metadata_fields(table_name)',get_table_metadata_fields(table_name))
@@ -253,11 +261,11 @@ class Page_1_Content(ttk.Frame):
         #TODO: Dette skal være et loop i level_4_click:
         for i in range(count_field_types):
             print('get_table_metadata_field_types(table_name)',get_table_metadata_field_types(table_name, i))
+        print('final_table_id',final_table_id)
     
     def create_level_4_buttons(self, metadata_fields, table_name):
         print('metadata_fields',metadata_fields)
         for index, level_4_subject in enumerate(metadata_fields):
-            
             print('level_4_subject',level_4_subject)
             btn_text = metadata_fields[index]
             sub_button = tk.CTkButton(self.frame_4, text=btn_text, command=lambda callback=btn_text, callback2=index, callback3=table_name: self.level_4_click(callback, callback2, callback3))
@@ -266,15 +274,7 @@ class Page_1_Content(ttk.Frame):
         
     def level_4_click(self, btn_text, index, table_name):
         print("text", btn_text, 'index',index)
-        #TODO: Viser data, pt for hardcodet tabel.. skal med tiden flyttes til Next-knappen...
-        #get_table_data(table_name)
-        # print('get field contents:',get_table_metadata_field_types(table_name, index))
         btns = get_table_metadata_field_types(table_name, index)
-        # for i, btn in enumerate(btns):
-        #     print(btn)
-            # list = ttk.OptionMenu(self.frame_5, text=btn_text).pack()
-            # sub_button = tk.CTkButton(self.frame_5, text=btn['text'], command=lambda callback=btn_text, callback2=index, callback3=table_name: self.level_5_click(callback, callback2, callback3))
-            # sub_button.grid(row=i, column=0, sticky='nsew', padx=2, pady=2)
         self.grid_rowconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
         try:
@@ -286,51 +286,42 @@ class Page_1_Content(ttk.Frame):
                                                                 item_list=[f"{btn['text']}" for btn in btns])
         self.scrollable_checkbox_frame.pack(fill='both', expand=True) #grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
 
-    def level_5_click(self, btn_text, index, table_name):
-        print('test')
-
     def checkbox_frame_event(self):
         print(f"checkbox frame modified: {self.scrollable_checkbox_frame.get_checked_items()}")
-        
-# ########################## TEST TEST TEST ######################
-# class ScrollableCheckBoxFrame(tk.CTkScrollableFrame):
-#     def __init__(self, master, item_list, command=None, **kwargs):
-#         super().__init__(master, **kwargs)
 
-#         self.command = command
-#         self.checkbox_list = []
-#         for i, item in enumerate(item_list):
-#             self.add_item(item)
-
-#     def add_item(self, item):
-#         checkbox = tk.CTkCheckBox(self, text=item)
-#         if self.command is not None:
-#             checkbox.configure(command=self.command)
-#         # checkbox.grid(row=len(self.checkbox_list), column=0, pady=(0, 10))
-#         checkbox.pack(fill=tk.X, padx=10, pady=10)
-#         self.checkbox_list.append(checkbox)
-
-#     def remove_item(self, item):
-#         for checkbox in self.checkbox_list:
-#             if item == checkbox.cget("text"):
-#                 checkbox.destroy()
-#                 self.checkbox_list.remove(checkbox)
-#                 return
-
-#     def get_checked_items(self):
-#         return [checkbox.cget("text") for checkbox in self.checkbox_list if checkbox.get() == 1]
-    
-# ########################## TEST TEST TEST ######################
-# 
-#     
-# erhverv, industri, industriens salg af varer
-#BRANCHE07, OMSTYPE, Tid
 
 class Page_2_Content(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
-        ttk.Label(self, text="test2", background="orange").pack(side=tk.TOP, padx=10, fill='both', expand=True)
+        print('Page_2_Content')
+        lbl = tk.CTkLabel(self, text="test2")
+        
+        lbl.pack(side=tk.TOP, padx=10, fill='both', expand=True)        # btns = get_table_metadata_field_types(table_name, index)
+        btn = tk.CTkButton(self, text="test", command=lambda callback=lbl: self.clickme(callback))
+        btn.pack()
+        
+        # # for i, btn in enumerate(btns):
+        # #     print(btn)
+        #     # list = ttk.OptionMenu(self.frame_5, text=btn_text).pack()
+        #     # sub_button = tk.CTkButton(self.frame_5, text=btn['text'], command=lambda callback=btn_text, callback2=index, callback3=table_name: self.level_5_click(callback, callback2, callback3))
+        #     # sub_button.grid(row=i, column=0, sticky='nsew', padx=2, pady=2)
+        # self.grid_rowconfigure(0, weight=1)
+        # self.columnconfigure(2, weight=1)
+        # try:
+        #     self.scrollable_checkbox_frame.pack_forget()
+        # except:
+        #     pass
+        # # create scrollable checkbox frame
+        # self.scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=self.frame_5, width=200, command=self.checkbox_frame_event,
+        #                                                         item_list=[f"{btn['text']}" for btn in btns])
+        # self.scrollable_checkbox_frame.pack(fill='both', expand=True)
+        
         self.pack()
 
+    def clickme(self, lbl):
+        print("clickme")
+        lbl.configure(text=final_table_id, fg_color="grey")
+        print(final_table_id)
+        
 
 App(title='Project', geometry=(1600,800))
