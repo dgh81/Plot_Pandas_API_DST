@@ -111,6 +111,8 @@ class Page_1_Content(ttk.Frame):
         self.create_level_3_frame()
         self.level_4_buttons = {}
         self.create_level_4_frame()
+        
+        self.create_level_5_frame()
 
         self.pack(fill='both', expand=True)
 
@@ -143,6 +145,13 @@ class Page_1_Content(ttk.Frame):
         subjects_tuple = tuple(range(20))
         self.frame_4.rowconfigure(subjects_tuple, weight=1)
 
+    def create_level_5_frame(self):
+        self.frame_5 = ttk.Frame(self, style='Frame3.TFrame')
+        self.frame_5.pack(side='left', fill="both", expand=True, padx=10, pady=10)
+        self.frame_5.columnconfigure(0, weight=1)
+        subjects_tuple = tuple(range(20))
+        self.frame_5.rowconfigure(subjects_tuple, weight=1)
+
     def set_level_1_button_colors(self, index):
         print(tk.get_appearance_mode())
         print(tk.ThemeManager._currently_loaded_theme)
@@ -152,8 +161,8 @@ class Page_1_Content(ttk.Frame):
         for i in range(len(self.level_1_buttons)):
             # print(self.level_1_buttons[i].cget('fg_color')[0])
             # print(self.level_1_buttons[i].cget('fg_color')[1])
-            self.level_1_buttons[i].configure(fg_color='#3a7ebf')
-        self.level_1_buttons[index].configure(fg_color='#1f538d')
+            self.level_1_buttons[i].configure(fg_color='#242424') #3a7ebf
+        self.level_1_buttons[index].configure(fg_color='#1f538d') #1f538d
     
     #TODO Split i to funks:
     def clear_level_2_and_3_buttons(self):
@@ -215,8 +224,8 @@ class Page_1_Content(ttk.Frame):
         # print('fg:', self.level_2_buttons[index].cget('fg_color')[0])
         # x = self.level_2_buttons[index].cget('fg_color')[0]
         for i in range(len(self.level_2_buttons)):
-            self.level_2_buttons[i].configure(fg_color='#3a7ebf')
-        self.level_2_buttons[index].configure(fg_color='red')
+            self.level_2_buttons[i].configure(fg_color='#242424')
+        self.level_2_buttons[index].configure(fg_color='#1f538d')
 
     def level_2_click(self, level_2_sub, index):
         self.set_level_2_button_colors(index)
@@ -227,8 +236,8 @@ class Page_1_Content(ttk.Frame):
         # Button color reset and set clicked:
         print(index)
         for i in range(len(self.level_3_buttons)):
-            self.level_3_buttons[i].configure(fg_color='#3a7ebf') # invis:'SystemButtonFace'
-        self.level_3_buttons[index].configure(fg_color='orange')
+            self.level_3_buttons[i].configure(fg_color='#242424') # invis:'SystemButtonFace'
+        self.level_3_buttons[index].configure(fg_color='#1f538d')
 
     def level_3_click(self, level_3_sub, index):
         id = str(level_3_sub['id'])
@@ -256,8 +265,63 @@ class Page_1_Content(ttk.Frame):
     def level_4_click(self, btn_text, index, table_name):
         print("text", btn_text, 'index',index)
         #TODO: Viser data, pt for hardcodet tabel.. skal med tiden flyttes til Next-knappen...
-        get_table_data(table_name)
+        #get_table_data(table_name)
+        # print('get field contents:',get_table_metadata_field_types(table_name, index))
+        btns = get_table_metadata_field_types(table_name, index)
+        for i, btn in enumerate(btns):
+            print(btn)
+            # list = ttk.OptionMenu(self.frame_5, text=btn_text).pack()
 
+            # sub_button = tk.CTkButton(self.frame_5, text=btn['text'], command=lambda callback=btn_text, callback2=index, callback3=table_name: self.level_5_click(callback, callback2, callback3))
+            # sub_button.grid(row=i, column=0, sticky='nsew', padx=2, pady=2)
+        self.grid_rowconfigure(0, weight=1)
+        self.columnconfigure(2, weight=1)
+        try:
+            self.scrollable_checkbox_frame.pack_forget()
+        except:
+            pass
+        # create scrollable checkbox frame
+        self.scrollable_checkbox_frame = ScrollableCheckBoxFrame(master=self.frame_5, width=200, command=self.checkbox_frame_event,
+                                                                item_list=[f"{btn['text']}" for btn in btns])
+        self.scrollable_checkbox_frame.pack(fill='both', expand=True) #grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
+
+    def level_5_click(self, btn_text, index, table_name):
+        print('test')
+
+    def checkbox_frame_event(self):
+        print(f"checkbox frame modified: {self.scrollable_checkbox_frame.get_checked_items()}")
+        
+########################## TEST TEST TEST ######################
+class ScrollableCheckBoxFrame(tk.CTkScrollableFrame):
+    def __init__(self, master, item_list, command=None, **kwargs):
+        super().__init__(master, **kwargs)
+
+        self.command = command
+        self.checkbox_list = []
+        for i, item in enumerate(item_list):
+            self.add_item(item)
+
+    def add_item(self, item):
+        checkbox = tk.CTkCheckBox(self, text=item)
+        if self.command is not None:
+            checkbox.configure(command=self.command)
+        # checkbox.grid(row=len(self.checkbox_list), column=0, pady=(0, 10))
+        checkbox.pack(fill=tk.X, padx=10, pady=10)
+        self.checkbox_list.append(checkbox)
+
+    def remove_item(self, item):
+        for checkbox in self.checkbox_list:
+            if item == checkbox.cget("text"):
+                checkbox.destroy()
+                self.checkbox_list.remove(checkbox)
+                return
+
+    def get_checked_items(self):
+        return [checkbox.cget("text") for checkbox in self.checkbox_list if checkbox.get() == 1]
+    
+########################## TEST TEST TEST ######################
+# 
+#     
 # erhverv, industri, industriens salg af varer
 #BRANCHE07, OMSTYPE, Tid
 
