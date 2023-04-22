@@ -18,6 +18,8 @@ tk.set_default_color_theme('dark-blue')
 global_table_name = ''
 final_table_id = None
 meta_fields = []
+
+listboxes_has_been_created = False
 # global_selected_level_2_ID = ''
 
 class App(tk.CTk):
@@ -38,7 +40,7 @@ class App(tk.CTk):
         self.add_page(p1)
 
         p2 = Page(self, "page 2")
-        # pg2content = Page_2_Content(p2)
+        pg2content = Page_2_Content(p2)
         self.add_page(p2)
 
         # Footer:
@@ -60,8 +62,8 @@ class App(tk.CTk):
             page = self.pages[self.count_pages]
             page.pack(pady=10, fill='both', expand=True)
             print('meta_fields',meta_fields)
-            # OBS ! init her betyder at page 2 reloades når man gør frem og tilbage?!
-            p2 = Page_2_Content(page)
+            #TODO BUG !! OBS ! betyder at page 2 reloades når man gør frem og tilbage?!
+            # p2 = Page_2_Content(page)
             # p2.__init__(self)
 
     def move_back_page(self):
@@ -72,12 +74,18 @@ class App(tk.CTk):
             page = self.pages[self.count_pages]
             page.pack(pady=10, fill='both', expand=True)
 
+
 class Page(tk.CTkFrame):
     def __init__(self, parent, title_text):
         super().__init__(parent)
         self.pageHeader = "test"
         self.title = tk.CTkLabel(self, text=title_text).pack(fill='both')
         self.configure(fg_color='teal')
+    #     self.bind('<Map>', self.test2) # event der triggers ved back eller next buttons
+
+    # def test2(self, event):
+    #     print(self)
+
 
 class Footer(tk.CTkFrame):
     def __init__(self, parent):
@@ -312,32 +320,56 @@ class Page_2_Content(tk.CTkFrame):
         # I stedet for at kalde på create_level_1_frame, etc...
         # meta_fields herunder indeholder antallet af loops...
 
-        btns = meta_fields # get_table_metadata_field_types(final_table_id, 1)
-        print('meta_fields',meta_fields)
+        # btns = meta_fields # get_table_metadata_field_types(final_table_id, 1)
+        # print('meta_fields',meta_fields)
         
-        self.create_frames(btns)
+        # self.create_frames(btns)
 
-        self.grid_rowconfigure(0, weight=1)
-        self.columnconfigure(2, weight=1)
-        try:
-            self.scrollable_checkbox_frame2.pack_forget()
-        except:
-            pass
-        # create scrollable checkbox frame
-        # self.scrollable_checkbox_frame2 = custom_listbox.ScrollableCheckBoxFrame(master=self.frame_1, width=200, command=self.checkbox_frame_event,
-        #                                                         item_list=[f"test{btn}" for btn in btns])
-        # self.scrollable_checkbox_frame2.pack(fill='both', expand=True)
+        # self.grid_rowconfigure(0, weight=1)
+        # self.columnconfigure(2, weight=1)
 
+        # self.listboxes = []
         self.listboxes = []
-        #TODO: Der skal laves et slags loop hvor scrollCheckBoxes tilføjes tilf self.listboxes
-        #Når der altid kaldes på self.scrollable_checkbox_frame2, virker kun den sidste overskrevne liste
-        for index,fr in enumerate(self.frames):
-            scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=fr, width=2, command=lambda callback=index: self.checkbox_frame_event(callback),
-                                                                item_list=[f"temp{index}" for btn in btns])
-            self.listboxes.append(scrollable_checkbox_frame)
-            scrollable_checkbox_frame.pack(side='left', fill='both', expand=True)
+        # for index,fr in enumerate(self.frames):
+        #     scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=fr, width=2, command=lambda callback=index: self.checkbox_frame_event(callback),
+        #                                                         item_list=[f"temp{index}" for btn in btns])
+        #     self.listboxes.append(scrollable_checkbox_frame)
+        #     scrollable_checkbox_frame.pack(side='left', fill='both', expand=True)
+        
+
+
+        self.bind('<Map>', self.test2) # event der triggers ved back eller next buttons
 
         self.pack(fill='both', expand=True)
+
+    #TODO TROR ALT DET HER SKAL OP I NEXT / BACK - der skal ske forskellige updates / ikke-updates af pages/content alt efter om man går next eller nack
+    def test2(self, event):
+        # create listboxes on 1st run
+        global listboxes_has_been_created
+        if listboxes_has_been_created:
+            pass
+        else:
+            btns = meta_fields # get_table_metadata_field_types(final_table_id, 1)
+            print('meta_fields',meta_fields)
+            
+            for index,fr in enumerate(self.frames):
+                fr.pack_forget()
+                for lb in fr.listboxes:
+                    lb.pack_forget()
+
+            self.create_frames(btns)
+
+            self.grid_rowconfigure(0, weight=1)
+            self.columnconfigure(2, weight=1)
+
+            for index,fr in enumerate(self.frames):
+                scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=fr, width=2, command=lambda callback=index: self.checkbox_frame_event(callback),
+                                                                    item_list=[f"temp{index}" for btn in btns])
+                self.listboxes.append(scrollable_checkbox_frame)
+                scrollable_checkbox_frame.pack(side='left', fill='both', expand=True)
+            
+            listboxes_has_been_created = True
+            
 
     def checkbox_frame_event(self, index):
         print(f"checkbox frame modified: {self.listboxes[index].get_checked_items()}")
