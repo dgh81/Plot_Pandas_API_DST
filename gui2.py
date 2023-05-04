@@ -7,7 +7,7 @@ from api import get_table_metadata_fields
 from api import get_table_metadata_field_types
 
 import custom_listbox
-# import tkinter as tk
+import tkinter as t
 # from tkinter import ttk
 
 import customtkinter as tk
@@ -20,7 +20,8 @@ final_table_id = None
 meta_fields = []
 
 listboxes_has_been_created = False
-# global_selected_level_2_ID = ''
+
+#TODO: BUG: Back fra page 3 til 2 virker stadig ikke!
 
 class App(tk.CTk):
     def __init__(self, title, geometry):
@@ -35,19 +36,18 @@ class App(tk.CTk):
         # Pages setup:
         self.pages = []
         p1 = Page(self, "page 1")
-        pg1content = Page_1_Content(p1)
+        Page_1_Content(p1)
         p1.pack(pady=10, fill='both', expand=True) # Vis side 1:
         self.add_page(p1)
 
-        global p2
         p2 = Page(self, "page 2")
-        global pg2content
-        pg2content = Page_2_Content(p2)
         self.add_page(p2)
+
+        p3 = Page(self, "page 3")
+        self.add_page(p3)
 
         # Footer:
         footer = Footer(self)
-
         footer.pack(side=tk.BOTTOM, pady=20, padx=20, fill='both')
 
         # Run app
@@ -55,31 +55,46 @@ class App(tk.CTk):
 
     def add_page(self, page):
         self.pages.append(page)
+
+    def load_page(self, page):
+        # TODO: Dette skal tage højde for om det er p1, p2, p3 etc...
+        print('self.count_pages on load/next:',self.count_pages)
+        self.pages.remove(page)
+        if self.count_pages == 1:
+            # page.destroy()
+            p2 = Page(self, "page 2")
+            Page_2_Content(p2)
+            self.pages.append(p2)
+            return p2
+        if self.count_pages == 2:
+            # page.destroy()
+            p3 = Page(self, "page 3")
+            Page_3_Content(p3)
+            self.pages.append(p3)
+            return p3
     
     def move_next_page(self):
+        
         if not self.count_pages > len(self.pages) - 2:
-            # pg2content.destroy()
-            # pg2content.pack_forget()
-            
             for page in self.pages:
                 page.pack_forget()
             self.count_pages += 1
             page = self.pages[self.count_pages]
-            page.pack(pady=10, fill='both', expand=True)
-            print('meta_fields',meta_fields)
-
-            #TODO BUG !! OBS ! betyder at page 2 reloades når man gør frem og tilbage?!
-            # p2 = Page_2_Content(page)
-            # p2.__init__(self)
-            # p2.destroy()
+            # print('meta_fields',meta_fields)
+            self.load_page(page).pack(pady=10, fill='both', expand=True)
+            
 
     def move_back_page(self):
         if not self.count_pages == 0:
             for page in self.pages:
                 page.pack_forget()
+            # count_pages er faktisk mere page_index...
             self.count_pages -= 1
             page = self.pages[self.count_pages]
+            print('self.count_pages on back:',self.count_pages, 'page', page)
+            #page er pt page3 !?
             page.pack(pady=10, fill='both', expand=True)
+            
 
 
 class Page(tk.CTkFrame):
@@ -87,7 +102,9 @@ class Page(tk.CTkFrame):
         super().__init__(parent)
         self.pageHeader = "test"
         self.title = tk.CTkLabel(self, text=title_text).pack(fill='both')
-        self.configure(fg_color='teal')
+        #self.configure(fg_color='teal')
+
+
     #     self.bind('<Map>', self.test2) # event der triggers ved back eller next buttons
 
     # def test2(self, event):
@@ -110,7 +127,7 @@ class Page_1_Content(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         tk.CTkLabel(parent, text="Label: Vælg datasæt").pack(side=tk.TOP, padx=10)
-        self.configure(fg_color='orange')
+        # self.configure(fg_color='orange')
         # LEVEL 1 FRAME:
         self.create_level_1_frame()
         self.level_1_buttons = {}
@@ -127,8 +144,7 @@ class Page_1_Content(tk.CTkFrame):
         self.create_level_3_frame()
         self.level_4_buttons = {}
         self.create_level_4_frame()
-        #TODO: Skal fjernes når page 2 er klar:
-        # self.create_level_5_frame()
+
 
         self.pack(fill='both', expand=True)
 
@@ -160,13 +176,6 @@ class Page_1_Content(tk.CTkFrame):
         self.frame_4.columnconfigure(0, weight=1)
         subjects_tuple = tuple(range(20))
         self.frame_4.rowconfigure(subjects_tuple, weight=1)
-
-    # def create_level_5_frame(self):
-    #     self.frame_5 = tk.CTkFrame(self)
-    #     self.frame_5.pack(side='left', fill="both", expand=True, padx=10, pady=10)
-    #     self.frame_5.columnconfigure(0, weight=1)
-    #     subjects_tuple = tuple(range(20))
-    #     self.frame_5.rowconfigure(subjects_tuple, weight=1)
 
     def set_level_1_button_colors(self, index):
         print(tk.get_appearance_mode())
@@ -253,50 +262,29 @@ class Page_1_Content(tk.CTkFrame):
             except:
                 print("fail")
                 pass
+
     #TODO: Behøver ikke selected_level_3_ID, selected_level_2_ID, bare det sidste valgte table's id...
     def level_3_click(self, level_3_sub, index, selected_level_3_ID):
 
         id = str(level_3_sub['id'])
-        # print(id)
         global final_table_id
         final_table_id = id
 
         self.set_level_3_button_colors(index)
         #TODO: Brug global_table_name?
         table_name = get_table_name(id)
-        # print("table name:", table_name)
-        # print('get_table_metadata_fields(table_name)',get_table_metadata_fields(table_name))
+
         global meta_fields
         meta_fields = get_table_metadata_fields(table_name)
-        count_field_types = len(get_table_metadata_fields(table_name))
         self.create_level_4_buttons(get_table_metadata_fields(table_name), table_name)
-        #TODO: Dette skal være et loop i level_4_click:
-        for i in range(count_field_types):
-            print('get_table_metadata_field_types(table_name)',get_table_metadata_field_types(table_name, i))
-        print('final_table_id',final_table_id)
     
     def create_level_4_buttons(self, metadata_fields, table_name):
         print('metadata_fields',metadata_fields)
         for index, level_4_subject in enumerate(metadata_fields):
-            # print('level_4_subject',level_4_subject)
             btn_text = metadata_fields[index]
             sub_button = tk.CTkButton(self.frame_4, text=btn_text, command=lambda callback=btn_text, callback2=index, callback3=table_name: self.level_4_click(callback, callback2, callback3))
             sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
             self.level_4_buttons[index] = sub_button
-        
-    # def level_4_click(self, btn_text, index, table_name):
-    #     # print("text", btn_text, 'index',index)
-    #     btns = get_table_metadata_field_types(table_name, index)
-    #     self.grid_rowconfigure(0, weight=1)
-    #     self.columnconfigure(2, weight=1)
-    #     try:
-    #         self.scrollable_checkbox_frame.pack_forget()
-    #     except:
-    #         pass
-    #     # create scrollable checkbox frame
-    #     self.scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=self.frame_5, width=200, command=self.checkbox_frame_event,
-    #                                                             item_list=[f"{btn['text']}" for btn in btns])
-    #     self.scrollable_checkbox_frame.pack(fill='both', expand=True) #.grid(row=0, column=0, padx=15, pady=15, sticky="nsew")
 
     def checkbox_frame_event(self):
         print(f"checkbox frame modified: {self.scrollable_checkbox_frame.get_checked_items()}")
@@ -306,56 +294,66 @@ class Page_2_Content(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        print("Page_2_Content running")
+
         lbl = tk.CTkLabel(self, text="test2")
         lbl.pack(side=tk.TOP, padx=10, fill='both')
-        
-        btn = tk.CTkButton(self, text="test", command=lambda callback=lbl: self.clickme(callback))
-        btn.pack()
 
-        self.listboxes = []
+        self.listbox_frames = []
 
-        self.pack(fill='both', expand=True)
-            
-
-    def checkbox_frame_event(self, index):
-        print(f"checkbox frame modified: frame: {self} items:{self.listboxes[index].get_checked_items()}")
-
-    def clickme(self, lbl):
-        print("clickme")
-        print("clickme self:",self)
         lbl.configure(text=final_table_id, fg_color="grey")
-        print('final_table_id',final_table_id)
 
-        try:
-            for l in self.listboxes:
-                print('checkbox_list',l.checkbox_list)
-                for cb in l.checkbox_list:
-                    cb.remove(cb)
-                    # cb.pack_forget()
-                l.remove(l)
-                l.destroy()
-                l.pack_forget()
-        except:
-            pass
+        # Gør det her stadig noget?
+        # try:
+        #     for listbox_frame in self.listbox_frames:
+        #         for cb in listbox_frame.checkbox_list:
+        #             cb.remove(cb)
+        #         listbox_frame.remove(listbox_frame)
+        #         listbox_frame.destroy()
+        #         listbox_frame.pack_forget()
+        # except:
+        #     pass
 
         btns = meta_fields
-        print('meta_fields',meta_fields)
 
         self.grid_rowconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
 
+        table_name = get_table_name(final_table_id)
+
+        listbox_content = []
+
         for index in range(len(btns)):
-            print(index)
-            # scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=self, width=2, command=lambda callback=index: self.checkbox_frame_event(callback),
-            #                                                     item_list=[f"temp{index}" for btn in btns])
             scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=self, width=2, command=lambda callback=index: self.checkbox_frame_event(callback), item_list=[])
-            # scrollable_checkbox_frame.add_item(index)
-            print('scrollable_checkbox_frame:',scrollable_checkbox_frame)
-            self.listboxes.append(scrollable_checkbox_frame)
+            self.listbox_frames.append(scrollable_checkbox_frame)
             scrollable_checkbox_frame.pack(side='left', fill='both', expand=True)
 
-        print('self.listboxes',self.listboxes)
-        for l in self.listboxes:
-            l.add_item("test")
+
+        for index,listbox_frame in enumerate(self.listbox_frames):
+            
+            num_fields = len(get_table_metadata_field_types(table_name, index))
+            print(num_fields)
+
+            listbox_content.append(get_table_metadata_field_types(table_name, index))
+            for i in range(num_fields):
+                item = listbox_content[index][i]['text']
+                listbox_frame.add_item(item)
+                # print(listbox_content[index][i]['text'])
+
+        self.pack(fill='both', expand=True)
+
+    def checkbox_frame_event(self, index):
+        print(f"checkbox frame modified: frame: {self} items:{self.listbox_frames[index].get_checked_items()}")
+
+class Page_3_Content(tk.CTkFrame):
+    def __init__(self, parent):
+        super().__init__(parent)
+
+        print("Page_3_Content running")
+
+        lbl = tk.CTkLabel(self, text="test3")
+        lbl.pack(side=tk.TOP, padx=10, fill='both')
+        
+
 
 App(title='Project', geometry=(1500,800))

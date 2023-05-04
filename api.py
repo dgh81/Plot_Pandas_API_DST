@@ -170,7 +170,7 @@ def get_table_metadata_field_types(table_name, field_id):
             #     table_field_types.append(val)
     except:
         pass
-    print(len(table_field_types))
+    # print(len(table_field_types))
     # return table_field_types
     return result['variables'][int(f"{field_id}")]['values']
 
