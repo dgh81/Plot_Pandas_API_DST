@@ -37,23 +37,49 @@ def plot_results(results):
         # print(dat)
         if len(dat) > 0:
             dat2 = dat.split(";")
-            # print('dat2',dat2[1]," ",dat2[2])
+            
+            #TODO: Find ud af hvordan tallene 2 og 3 herunder kan laves dynamiske?
             my_x = str(dat2[2])
             my_y = str(dat2[3])
+            try:
+                my_x = my_x.replace("\r",'')
+                my_y = my_y.replace("\r",'')
+            except:
+                pass
+
             # print('my_y',my_y)
-            print('my_x',my_x)
-            # global x
-            # global test
-            # test += ","&my_x
+            # print('my_x',my_x)
+
             x.append(my_x)
-            # # y.append(my_y)
+            y.append(int(my_y))
             # print('x',x)
             # y.append('test y')
             # x.append('test x')
             # print("TEST 2")
         # print(test)
-        print("lenght:",len(x))
-        print('x',x)
+    print("lenght x:",len(x))
+    print('x',x)
+    print("lenght y:",len(y))
+    print('y',y)
+
+    #barh = liggende søjler
+    plt.barh(x, y,color='#0000FF',label='diagram label')
+
+
+
+    # plt.xlabel('x-akse', fontsize='small') #hvorfor virker fontsize ikke? tjek version af pyplot...
+    # plt.xticks(rotation=90)
+
+    # # behøver ikke ylabel ved barh type:
+    # # plt.ylabel('y-akse')
+
+    plt.title('Mit diagram')
+
+    # #No artists with labels found to put in legend.
+    # #Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+    plt.legend()
+
+    plt.show()
         # return x
 
     # print("????")
@@ -101,7 +127,7 @@ def plot_results(results):
 # plt.bar(x, y,color='#0000FF',label='Gennemsnitsalder')
 
 #barh = liggende søjler
-# plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
+plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
 
 
 
@@ -111,10 +137,10 @@ def plot_results(results):
 # # behøver ikke ylabel ved barh type:
 # # plt.ylabel('y-akse')
 
-# plt.title('Mit diagram')
+plt.title('Mit diagram')
 
 # #No artists with labels found to put in legend.
 # #Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
-# plt.legend()
+plt.legend()
 
-# plt.show()
+plt.show()

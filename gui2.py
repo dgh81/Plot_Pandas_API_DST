@@ -346,6 +346,7 @@ class Page_3_Content(tk.CTkFrame):
                 itemdict = {}
                 for item in us.sel[field_index]:
                     # print("item")
+                    #TODO rename t etc..
                     t = str(item).split(",")[0]
                     print("t:",t)
                     itemlist.append(str(t))
@@ -354,20 +355,15 @@ class Page_3_Content(tk.CTkFrame):
                 fieldlist.append(itemdict)
             print('fieldlist:',fieldlist)
 
-
             payload['table'] = get_table_name(final_table_id)
             payload['format'] = "CSV"
             payload['variables'] = fieldlist
             print('payload',payload)
-            # global results
+
             results = get_table_data(payload)
-            print("test4")
-            
+
             plot_results(results)
-            # print(dat)
-            # for x in dat:
-            #     print(x)
-            print("test3")
+
         except:
             pass
         
