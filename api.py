@@ -99,7 +99,8 @@ for sub in subjects:
     print(sub['id'])
     for s in sub["subjects"]:
         if len(s['subjects']) > 0:
-            print(s["id"])
+            pass
+            # print(s["id"])
             #TODO mangler et lag sunjects mere...
             #TDO Nej tag eet lag ad gangen
 
@@ -128,8 +129,8 @@ def get_table_name(table_id):
     rr = requests.post('https://api.statbank.dk/v1/tables', data=payload_get_table_name).json()
     for table in rr:
         pass
-        print(table)
-        print(table['id'], table['variables'])
+        # print(table)
+        # print(table['id'], table['variables'])
     return table['id']
     
 
@@ -185,8 +186,8 @@ def get_table_metadata_fields(table_name):
         for meta in result['variables']:
             print(meta['id'])
             table_fields.append(meta["id"])
-            # for val in meta["values"]:
-            #     print(val)
+            for val in meta["values"]:
+                print(val)
             #     pass
     except:
         pass
@@ -194,26 +195,27 @@ def get_table_metadata_fields(table_name):
 # get_table_metadata()
 
 #TODO: Denne skal bruge args som nr 2 argument, hvori variables bor, json herunder skal skabes dynamisk...
-def get_table_data(table_name):
-    payload = {
-        "table": f"{table_name}",
-        "format": "CSV",
-        "variables": [
-            {
-                "code": "BRANCHE07",
-                "values": ["CG"]
-            },
-            {
-                "code": "OMSTYPE",
-                "values": ["SAMLET"]
-            },
-            {
-                "code": "Tid",
-                "values": ["*"]
-            }
-        ],
+def get_table_data(payload):
+    # payload = {
+    #     "table": f"{table_name}",
+    #     "format": "CSV",
+    #     "variables": [
+    #         {
+    #             "code": "BRANCHE07",
+    #             "values": ["CG"]
+    #         },
+    #         {
+    #             "code": "OMSTYPE",
+    #             "values": ["SAMLET"]
+    #         },
+    #         {
+    #             "code": "Tid",
+    #             "values": ["*"]
+    #         }
+    #     ],
 
-    }
+    # }
+    print("running get_table_data")
     result = requests.post('https://api.statbank.dk/v1/data/', json=payload)
     result = result.text
     # print(result)
