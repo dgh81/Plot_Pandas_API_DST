@@ -221,5 +221,6 @@ def get_table_data(payload):
     # print(result)
 
     print(result)
+    return result
 
 # get_table_data()

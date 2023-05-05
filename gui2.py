@@ -5,6 +5,7 @@ from api import get_table_name
 from api import get_table_data
 from api import get_table_metadata_fields
 from api import get_table_metadata_field_types
+from Plot import plot_results
 
 import custom_listbox
 import tkinter as t
@@ -358,7 +359,15 @@ class Page_3_Content(tk.CTkFrame):
             payload['format'] = "CSV"
             payload['variables'] = fieldlist
             print('payload',payload)
-            get_table_data(payload)
+            # global results
+            results = get_table_data(payload)
+            print("test4")
+            
+            plot_results(results)
+            # print(dat)
+            # for x in dat:
+            #     print(x)
+            print("test3")
         except:
             pass
         
