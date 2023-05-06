@@ -37,21 +37,30 @@ def plot_results(results):
         # print(dat)
         if len(dat) > 0:
             dat2 = dat.split(";")
+            # dat2.pop()
+            print("dat2:", dat2, len(dat2)-1)
             
-            #TODO: Find ud af hvordan tallene 2 og 3 herunder kan laves dynamiske?
-            my_x = str(dat2[2])
-            my_y = str(dat2[3])
+            #TODO: Hardcoded: Henter 2 sidste kolonner, data og tid... overvej anden løsning, med valg i UI?
+            my_x = str(dat2[len(dat2)-2])
+            my_y = str(dat2[len(dat2)-1])
             try:
                 my_x = my_x.replace("\r",'')
-                my_y = my_y.replace("\r",'')
+                my_y = my_y.replace("\r",'').replace(",",'.')
             except:
                 pass
 
-            # print('my_y',my_y)
-            # print('my_x',my_x)
+            print('my_y',my_y)
+            print('my_x',my_x)
 
-            x.append(my_x)
-            y.append(int(my_y))
+            # x.append(my_x)
+
+            if my_y == "..":
+                pass
+                # my_y = 0
+                # y.append(my_y)
+            else:
+                x.append(my_x)
+                y.append(float(my_y))
             # print('x',x)
             # y.append('test y')
             # x.append('test x')

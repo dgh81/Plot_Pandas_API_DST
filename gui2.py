@@ -305,8 +305,10 @@ class Page_2_Content(tk.CTkFrame):
                 listbox_content.append(get_table_metadata_field_types(table_name, index))
                 for i in range(num_fields):
                     item = listbox_content[index][i]['text']
+                    #TODO OBS !!!!!!!!!!!!! Koden herunder tager id fra label-teksten!!! Lav om!!!! Se næste TODO
                     id = listbox_content[index][i]['id']
                     listbox_frame.add_item(f"{id},{item}")
+                    # listbox_frame.add_item(f"{item}")
 
                     #TODO Prøv at lave parameter for custom_listbox.py items, eg: self.id = id
                     # Det ville være godt at kunne hente id direkte fra get_checked_items() funktionen
@@ -346,7 +348,7 @@ class Page_3_Content(tk.CTkFrame):
                 itemdict = {}
                 for item in us.sel[field_index]:
                     # print("item")
-                    #TODO rename t etc..
+                    #TODO Dette skal laves om. Vi kan ikke tage id fra label-teksten. Se note række 308
                     t = str(item).split(",")[0]
                     print("t:",t)
                     itemlist.append(str(t))
@@ -363,6 +365,7 @@ class Page_3_Content(tk.CTkFrame):
             results = get_table_data(payload)
 
             plot_results(results)
+            #TODO BUG: Hvis man trykker baglæns herfra, nulstilles x og y ikke ?! Fix
 
         except:
             pass
