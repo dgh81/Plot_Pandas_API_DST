@@ -224,8 +224,8 @@ class Page_1_Content(tk.CTkFrame):
             print("empty!","Using level 2 code:",level_3_subjects[0]['id']) # TODO: Filtrer tomme fra eller hva?
         for index, level_3_subject in enumerate(level_3_subjects[0]['subjects']):
             btn_text = level_3_subject['description']
-            selected_level_3_ID = level_3_subject['id']
-            sub_button = tk.CTkButton(self.frame_3, text=btn_text, command=lambda callback=level_3_subject, callback2=index, callback3=selected_level_3_ID: self.level_3_click(callback, callback2, callback3))
+            # selected_level_3_ID = level_3_subject['id']
+            sub_button = tk.CTkButton(self.frame_3, text=btn_text, command=lambda callback=level_3_subject, callback2=index: self.level_3_click(callback, callback2))
             sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
             self.level_3_buttons[index] = sub_button
 
@@ -236,16 +236,23 @@ class Page_1_Content(tk.CTkFrame):
         self.level_3_buttons[index].configure(fg_color='#1f538d')
     
     def clear_level_3_buttons(self):
+        #TODO Skift range(20) herunder til noget mere dynamisk
         for i in range(20):
             try:
                 self.frame_3.grid_slaves()[0].destroy()
                 self.level_3_buttons.clear()
             except:
-                print("fail")
                 pass
 
-    #TODO: Behøver ikke selected_level_3_ID, selected_level_2_ID, bare det sidste valgte table's id...
-    def level_3_click(self, level_3_sub, index, selected_level_3_ID):
+    def clear_level_4_buttons(self):
+        for i in range(20):
+            try:
+                self.frame_4.grid_slaves()[0].destroy()
+                self.level_4_buttons.clear()
+            except:
+                pass
+    
+    def level_3_click(self, level_3_sub, index):
 
         id = str(level_3_sub['id'])
         global final_table_id
@@ -257,8 +264,10 @@ class Page_1_Content(tk.CTkFrame):
 
         global meta_fields
         meta_fields = get_table_metadata_fields(table_name)
+        self.clear_level_4_buttons()
         self.create_level_4_buttons(get_table_metadata_fields(table_name), table_name)
     
+    #TODO Det her skal ændres fra buttons til labels!
     def create_level_4_buttons(self, metadata_fields, table_name):
         print('metadata_fields',metadata_fields)
         for index, level_4_subject in enumerate(metadata_fields):
@@ -317,12 +326,12 @@ class Page_2_Content(tk.CTkFrame):
             pass
 
     def checkbox_frame_event(self, index):
-        print(f"checkbox frame modified: frame: {self.listbox_frames[index]} items:{self.listbox_frames[index].get_checked_items()}")
-
+        print(f"checkbox frame modified: frame: {self.listbox_frames[index]} items:{self.listbox_frames[index].get_checked_items_id()}")
+        #TODO: Her skal der oprettes en get_checked_items_id og user selections fyldes derefter.
         global us
         us = User_selections(self)
         for i in range(len(self.listbox_frames)):
-            us.add_to_list(self.listbox_frames[i].get_checked_items())
+            us.add_to_list(self.listbox_frames[i].get_checked_items_id())
 
 class User_selections():
     def __init__(self, parent):
@@ -346,12 +355,17 @@ class Page_3_Content(tk.CTkFrame):
                 # fieldlist.append(field)
                 itemlist = []
                 itemdict = {}
-                for item in us.sel[field_index]:
+                for item_id in us.sel[field_index]:
                     # print("item")
                     #TODO Dette skal laves om. Vi kan ikke tage id fra label-teksten. Se note række 308
-                    t = str(item).split(",")[0]
-                    print("t:",t)
-                    itemlist.append(str(t))
+                    # Er igang. De ovenfor, der skal oprettes en get_cjecked_items_ids function i custom_listbox.py!
+                    # PT hentes tekstværdien ikke code, som derefter sender forkert json til dst.dk...
+                    # t = str(item).split(",")[0]
+                    # print("t:",t, "item.id", item.id)
+
+                    # print("item.id", item_id) #rename item til id
+                    # itemlist.append(str(t))
+                    itemlist.append(str(item_id))
                     itemdict['code'] = field
                     itemdict['values'] = itemlist
                 fieldlist.append(itemdict)
