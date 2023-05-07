@@ -6,7 +6,7 @@ class ScrollableCheckBoxFrame(tk.CTkScrollableFrame):
 
         self.command = command
         self.checkbox_list = []
-        for i, item in enumerate(item_list):
+        for i, item in enumerate(item_list): #TODO: Behøver ikke enumerate?
             self.add_item(item)
 
     def add_item(self, item_text, item_id):
@@ -16,14 +16,6 @@ class ScrollableCheckBoxFrame(tk.CTkScrollableFrame):
             checkbox.configure(command=self.command)
         checkbox.pack(fill=tk.X, padx=10, pady=10)
         self.checkbox_list.append(checkbox)
-
-    # def add_item(self, item):
-    #     #TODO Opret 2 input parametre i stedet for at splitte i funktionen!
-    #     checkbox = myCheckBox(self, text=item.split(",")[1], id=item.split(",")[0])
-    #     if self.command is not None:
-    #         checkbox.configure(command=self.command)
-    #     checkbox.pack(fill=tk.X, padx=10, pady=10)
-    #     self.checkbox_list.append(checkbox)
 
     def remove_item(self, item):
         for checkbox in self.checkbox_list:
