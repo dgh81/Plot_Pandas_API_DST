@@ -189,13 +189,14 @@ class Page_1_Content(tk.CTkFrame):
 
     #TODO Split i to funks?:
     def clear_level_2_and_3_buttons(self):
-        for i in range(20):
+        #TODO: Mangler: Ved tryk på knapper i level 1 og 2, skal kolonne 3 og 4 cleares
+        for i in range(len(self.frame_2.grid_slaves())):
             try:
                 self.frame_2.grid_slaves()[0].destroy()
                 self.level_2_buttons.clear()
             except:
                 pass
-        for i in range(20):
+        for i in range(len(self.frame_3.grid_slaves())):
             try:
                 self.frame_3.grid_slaves()[0].destroy()
                 self.level_3_buttons.clear()
@@ -236,8 +237,7 @@ class Page_1_Content(tk.CTkFrame):
         self.level_3_buttons[index].configure(fg_color='#1f538d')
     
     def clear_level_3_buttons(self):
-        #TODO Skift range(20) herunder til noget mere dynamisk
-        for i in range(20):
+        for i in range(len(self.frame_3.grid_slaves())):
             try:
                 self.frame_3.grid_slaves()[0].destroy()
                 self.level_3_buttons.clear()
@@ -272,7 +272,8 @@ class Page_1_Content(tk.CTkFrame):
         print('metadata_fields',metadata_fields)
         for index, level_4_subject in enumerate(metadata_fields):
             btn_text = metadata_fields[index]
-            sub_button = tk.CTkButton(self.frame_4, text=btn_text, command=lambda callback=btn_text, callback2=index, callback3=table_name: self.level_4_click(callback, callback2, callback3))
+            sub_button = tk.CTkLabel(self.frame_4, text=btn_text)
+            # sub_button = tk.CTkButton(self.frame_4, text=btn_text, command=lambda callback=btn_text, callback2=index, callback3=table_name: self.level_4_click(callback, callback2, callback3))
             sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
             self.level_4_buttons[index] = sub_button
 
@@ -297,9 +298,7 @@ class Page_2_Content(tk.CTkFrame):
         self.columnconfigure(2, weight=1)
 
         try:
-
             table_name = get_table_name(final_table_id)
-
             listbox_content = []
 
             for index in range(len(meta_fields)):
@@ -314,20 +313,14 @@ class Page_2_Content(tk.CTkFrame):
                 listbox_content.append(get_table_metadata_field_types(table_name, index))
                 for i in range(num_fields):
                     item = listbox_content[index][i]['text']
-                    #TODO OBS !!!!!!!!!!!!! Koden herunder tager id fra label-teksten!!! Lav om!!!! Se næste TODO
                     id = listbox_content[index][i]['id']
-                    listbox_frame.add_item(f"{id},{item}")
-                    # listbox_frame.add_item(f"{item}")
-
-                    #TODO Prøv at lave parameter for custom_listbox.py items, eg: self.id = id
-                    # Det ville være godt at kunne hente id direkte fra get_checked_items() funktionen
+                    listbox_frame.add_item(item,id)
         
         except:
             pass
 
     def checkbox_frame_event(self, index):
         print(f"checkbox frame modified: frame: {self.listbox_frames[index]} items:{self.listbox_frames[index].get_checked_items_id()}")
-        #TODO: Her skal der oprettes en get_checked_items_id og user selections fyldes derefter.
         global us
         us = User_selections(self)
         for i in range(len(self.listbox_frames)):
@@ -347,7 +340,7 @@ class Page_3_Content(tk.CTkFrame):
         super().__init__(parent)
 
         print("Page_3_Content running")
-        try:
+        try: # try er lavet for page 2 og 3, for at undgå fejl under første opstart, hvor variable ikke er blevet sat.
             lbl = tk.CTkLabel(self, text=f"{final_table_id}{us.sel} - metafields: {meta_fields} global_table_name: {global_table_name} final_table_id: {final_table_id}")
             lbl.pack(side=tk.TOP, padx=10, fill='both')
             fieldlist = []
@@ -355,17 +348,8 @@ class Page_3_Content(tk.CTkFrame):
                 # fieldlist.append(field)
                 itemlist = []
                 itemdict = {}
-                for item_id in us.sel[field_index]:
-                    # print("item")
-                    #TODO Dette skal laves om. Vi kan ikke tage id fra label-teksten. Se note række 308
-                    # Er igang. De ovenfor, der skal oprettes en get_cjecked_items_ids function i custom_listbox.py!
-                    # PT hentes tekstværdien ikke code, som derefter sender forkert json til dst.dk...
-                    # t = str(item).split(",")[0]
-                    # print("t:",t, "item.id", item.id)
-
-                    # print("item.id", item_id) #rename item til id
-                    # itemlist.append(str(t))
-                    itemlist.append(str(item_id))
+                for selected_id in us.sel[field_index]:
+                    itemlist.append(str(selected_id))
                     itemdict['code'] = field
                     itemdict['values'] = itemlist
                 fieldlist.append(itemdict)
