@@ -1,26 +1,22 @@
 from api import subjects
 from api import get_subject
 from api import get_table_name
-#from api import get_table_metadata
 from api import get_table_data
 from api import get_table_metadata_fields
 from api import get_table_metadata_field_types
 from Plot import plot_results
 
 import custom_listbox
-import tkinter as t
-# from tkinter import ttk
 
 import customtkinter as tk
-from tkinter import ttk
+
 tk.set_appearance_mode('dark')
 tk.set_default_color_theme('dark-blue')
 
 global_table_name = ''
 final_table_id = None
 meta_fields = []
-global myApp
-myApp = None
+
 us = None
 
 listboxes_has_been_created = False
@@ -46,8 +42,6 @@ class App(tk.CTk):
 
         p3 = Page_3(self)
         self.add_page(p3)
-
-
 
         # Footer:
         footer = Footer(self)
@@ -90,12 +84,10 @@ class App(tk.CTk):
             for page in self.pages:
                 print("forgetting:",page)
                 page.pack_forget()
-            # count_pages er faktisk mere page_index...
+            # count_pages er faktisk mere page_index... TODO: rename
             self.count_pages -= 1
             page = self.pages[self.count_pages]
-            # mpage = self.pages[self.count_pages+1]
             self.pages.remove(page)
-            # self.pages.remove(mpage)
             self.load_page()
 
 class Footer(tk.CTkFrame):
@@ -373,29 +365,28 @@ class Page_3(tk.CTkFrame):
         
 global payload
 payload = {
-   "table": "SKIB74",
-   "format": "CSV",
-   "variables": [
-      {
-         "code": "LANDGRP",
-         "values": [
+    "table": "SKIB74",
+    "format": "CSV",
+    "variables": [
+        {
+            "code": "LANDGRP",
+            "values": [
             "00"
-         ]
-      },
-      {
-         "code": "GODS",
-         "values": [
+            ]
+        },
+        {
+            "code": "GODS",
+            "values": [
             "100"
-         ]
-      },
-      {
-         "code": "Tid",
-         "values": [
+            ]
+        },
+        {
+            "code": "Tid",
+            "values": [
             "2000K1"
-         ]
-      }
-   ]
+            ]
+        }
+    ]
 }
 
-# global myApp
-myApp = App(title='Project', geometry=(1500,800))
+App(title='Project', geometry=(1500,800))
