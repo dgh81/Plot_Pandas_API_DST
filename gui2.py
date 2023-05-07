@@ -25,8 +25,6 @@ us = None
 
 listboxes_has_been_created = False
 
-#TODO: BUG: Back fra page 3 til 2 virker stadig ikke!
-
 class App(tk.CTk):
     def __init__(self, title, geometry):
         # App setup
@@ -39,15 +37,14 @@ class App(tk.CTk):
 
         # Pages setup:
         self.pages = []
-        p1 = Page_1_Content(self)
+        p1 = Page_1(self)
         p1.pack(pady=10, fill='both', expand=True) # Vis side 1:
         self.add_page(p1)
         
-        p2 = Page_2_Content(self)
-        # p2.pack(pady=10, fill='both', expand=True)
+        p2 = Page_2(self)
         self.add_page(p2)
 
-        p3 = Page_3_Content(self)
+        p3 = Page_3(self)
         self.add_page(p3)
 
 
@@ -64,16 +61,16 @@ class App(tk.CTk):
 
     def load_page(self):
         if self.count_pages == 0:
-            p1 = Page_1_Content(self)
+            p1 = Page_1(self)
             self.pages.append(p1)
             p1.pack(pady=10, fill='both', expand=True)
         if self.count_pages == 1:
-            p2 = Page_2_Content(self)
+            p2 = Page_2(self)
             self.pages.append(p2)
             print('self.pages in load_page2:',self.pages)
             p2.pack(pady=10, fill='both', expand=True)
         if self.count_pages == 2:
-            p3 = Page_3_Content(self)
+            p3 = Page_3(self)
             self.pages.append(p3)
             print('self.pages in load_page3:',self.pages)
             p3.pack(pady=10, fill='both', expand=True)
@@ -111,7 +108,7 @@ class Footer(tk.CTkFrame):
         btn_next.pack(side=tk.RIGHT, padx=20)
         self.footerFrame.pack(expand=True, fill='both')
 
-class Page_1_Content(tk.CTkFrame):
+class Page_1(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         tk.CTkLabel(self, text="Label: Vælg datasæt").pack(side=tk.TOP, padx=10)
@@ -125,7 +122,7 @@ class Page_1_Content(tk.CTkFrame):
             sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
             self.level_1_buttons[index] = sub_button
         
-        # LEVEL 2 AND 3 FRAME:
+        # LEVEL 2, 3 AND 4 FRAME:
         self.level_2_buttons = {}
         self.create_level_2_frame()
         self.level_3_buttons = {}
@@ -146,6 +143,7 @@ class Page_1_Content(tk.CTkFrame):
         self.frame_2 = tk.CTkFrame(self)
         self.frame_2.pack(side='left', fill="both", expand=True, padx=10, pady=10)
         self.frame_2.columnconfigure(0, weight=1)
+        #TODO: Overvej bedre måde end harcoded 20 herunder?
         subjects_tuple = tuple(range(20))
         self.frame_2.rowconfigure(subjects_tuple, weight=1)
 
@@ -170,7 +168,7 @@ class Page_1_Content(tk.CTkFrame):
         for i in range(len(self.level_1_buttons)):
             self.level_1_buttons[i].configure(fg_color='#242424') #3a7ebf
         self.level_1_buttons[index].configure(fg_color='#1f538d') #1f538d
-        global global_table_name
+        global global_table_name #TODO: rename til noget a la 'level_1_table_name'
         global_table_name = self.level_1_buttons[index].cget("text")
         print('global_table_name',global_table_name)
 
@@ -178,8 +176,6 @@ class Page_1_Content(tk.CTkFrame):
         self.set_level_1_button_colors(index)
         self.clear_level_2_and_3_buttons()
         self.create_level_2_buttons(sub,index)
-
-
     
     def set_level_2_button_colors(self, index):
         # Button color reset and set clicked:
@@ -187,7 +183,8 @@ class Page_1_Content(tk.CTkFrame):
             self.level_2_buttons[i].configure(fg_color='#242424')
         self.level_2_buttons[index].configure(fg_color='#1f538d')
 
-    #TODO Split i to funks?:
+    #TODO Split i 3 funks og implementér under de forskellige kliks level_1 etc..:
+    #(pt cleares lvl 4 ikke ved tryk på level 2)
     def clear_level_2_and_3_buttons(self):
         #TODO: Mangler: Ved tryk på knapper i level 1 og 2, skal kolonne 3 og 4 cleares
         for i in range(len(self.frame_2.grid_slaves())):
@@ -200,6 +197,12 @@ class Page_1_Content(tk.CTkFrame):
             try:
                 self.frame_3.grid_slaves()[0].destroy()
                 self.level_3_buttons.clear()
+            except:
+                pass
+        for i in range(len(self.frame_4.grid_slaves())):
+            try:
+                self.frame_4.grid_slaves()[0].destroy()
+                self.level_4_buttons.clear()
             except:
                 pass
 
@@ -267,8 +270,7 @@ class Page_1_Content(tk.CTkFrame):
         self.clear_level_4_buttons()
         self.create_level_4_buttons(get_table_metadata_fields(table_name), table_name)
     
-    #TODO Det her skal ændres fra buttons til labels!
-    def create_level_4_buttons(self, metadata_fields, table_name):
+    def create_level_4_buttons(self, metadata_fields, table_name): #TODO: ubrugte variable !!
         print('metadata_fields',metadata_fields)
         for index, level_4_subject in enumerate(metadata_fields):
             btn_text = metadata_fields[index]
@@ -281,7 +283,7 @@ class Page_1_Content(tk.CTkFrame):
         print(f"checkbox frame modified: {self.scrollable_checkbox_frame.get_checked_items()}")
 
 
-class Page_2_Content(tk.CTkFrame):
+class Page_2(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
@@ -326,7 +328,7 @@ class Page_2_Content(tk.CTkFrame):
         for i in range(len(self.listbox_frames)):
             us.add_to_list(self.listbox_frames[i].get_checked_items_id())
 
-class User_selections():
+class User_selections(): # Flyt til bedre sted i koden, evt til egen fil?
     def __init__(self, parent):
         self.parent = parent
         self.sel = []
@@ -335,11 +337,12 @@ class User_selections():
         self.sel.append(item)
         
 
-class Page_3_Content(tk.CTkFrame):
+class Page_3(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
         print("Page_3_Content running")
+        #TODO Find bedre løsning end try?
         try: # try er lavet for page 2 og 3, for at undgå fejl under første opstart, hvor variable ikke er blevet sat.
             lbl = tk.CTkLabel(self, text=f"{final_table_id}{us.sel} - metafields: {meta_fields} global_table_name: {global_table_name} final_table_id: {final_table_id}")
             lbl.pack(side=tk.TOP, padx=10, fill='both')
