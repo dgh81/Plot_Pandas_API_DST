@@ -28,6 +28,7 @@ class ScrollableCheckBoxFrame(tk.CTkScrollableFrame):
         return [checkbox.cget("text") for checkbox in self.checkbox_list if checkbox.get() == 1]
 
     def get_checked_items_id(self):
+        #TODO Kan vi bruge flere generatorer som denne rundt om i koden?
         return [checkbox.id for checkbox in self.checkbox_list if checkbox.get() == 1]
 
 class myCheckBox(tk.CTkCheckBox):

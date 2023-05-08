@@ -136,20 +136,20 @@ def plot_results(results):
 # plt.bar(x, y,color='#0000FF',label='Gennemsnitsalder')
 
 #barh = liggende søjler
-plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
+# plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
 
 
 
-# plt.xlabel('x-akse', fontsize='small') #hvorfor virker fontsize ikke? tjek version af pyplot...
-# plt.xticks(rotation=90)
+# # plt.xlabel('x-akse', fontsize='small') #hvorfor virker fontsize ikke? tjek version af pyplot...
+# # plt.xticks(rotation=90)
 
-# # behøver ikke ylabel ved barh type:
-# # plt.ylabel('y-akse')
+# # # behøver ikke ylabel ved barh type:
+# # # plt.ylabel('y-akse')
 
-plt.title('Mit diagram')
+# plt.title('Mit diagram')
 
-# #No artists with labels found to put in legend.
-# #Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
-plt.legend()
+# # #No artists with labels found to put in legend.
+# # #Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
+# plt.legend()
 
-plt.show()
+# plt.show()

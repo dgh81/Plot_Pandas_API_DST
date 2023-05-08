@@ -302,8 +302,10 @@ class Page_3(tk.CTkFrame):
             lbl = tk.CTkLabel(self, text=f"{final_table_id}{us.sel} - metafields: {meta_fields} global_table_name: {global_table_name} final_table_id: {final_table_id}")
             lbl.pack(side=tk.TOP, padx=10, fill='both')
             fieldlist = []
+
+            #Byg JSON
+            # TODO: Lidt rodet det her + bedre navne? + Træk ud i funktion!!
             for field_index,field in enumerate(meta_fields):
-                # TODO: Lidt rodet det her + bedre navne?
                 itemlist = []
                 itemdict = {}
                 for selected_id in us.sel[field_index]:
@@ -311,15 +313,17 @@ class Page_3(tk.CTkFrame):
                     itemdict['code'] = field
                     itemdict['values'] = itemlist
                 fieldlist.append(itemdict)
-            print('fieldlist:',fieldlist)
+            # print('fieldlist:',fieldlist)
 
             payload['table'] = get_table_name(final_table_id)
             payload['format'] = "CSV"
             payload['variables'] = fieldlist
             print('payload',payload)
 
+            #API Kald
             results = get_table_data(payload)
 
+            #Plot
             plot_results(results)
             #TODO BUG: Hvis man trykker baglæns herfra, nulstilles x og y ikke ?! Fix
 
