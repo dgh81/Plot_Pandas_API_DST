@@ -1,4 +1,5 @@
 ffmpeg -framerate 2 -pattern_type sequence -i C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img%3d.png -s:v 1920x1080 -c:v libx264 -pix_fmt yuv420p C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\out1.mp4
+ffmpeg -framerate 2 -pattern_type sequence -i C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img\img%1d.png -s:v 1920x1080 -c:v libx264 -pix_fmt yuv420p C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img\out1.mp4
 
 img%3d.png = img001.png, img002.png etc.
 

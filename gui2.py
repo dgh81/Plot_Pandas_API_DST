@@ -1,3 +1,6 @@
+
+#TODO Implementér farvekodet fejl etc i konsollen...
+
 from api import subjects
 from api import get_subject
 from api import get_table_name
@@ -5,6 +8,7 @@ from api import get_table_data
 from api import get_table_metadata_fields
 from api import get_table_metadata_field_types
 from Plot import plot_results
+from animation import start_submit_thread
 
 import custom_listbox
 
@@ -314,6 +318,9 @@ class Page_3(tk.CTkFrame):
 
             #Plot
             plot_results(results)
+
+            video_btn = tk.CTkButton(parent, text="video me!", command=start_submit_thread).pack(side=tk.LEFT, fill='both')
+
             
     def create_json_payload(self):
         #TODO Find bedre løsning end try?
