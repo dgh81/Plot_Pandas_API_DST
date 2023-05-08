@@ -17,7 +17,7 @@ global_table_name = ''
 final_table_id = None
 meta_fields = []
 
-us = None
+user_selections = None
 
 listboxes_has_been_created = False
 
@@ -44,8 +44,8 @@ class App(tk.CTk):
         self.add_page(p3)
 
         # Footer:
-        footer = Footer(self)
-        footer.pack(side=tk.BOTTOM, pady=20, padx=20, fill='both')
+        self.footer = Footer(self)
+        self.footer.pack(side=tk.BOTTOM, pady=20, padx=20, fill='both')
 
         # Run app
         self.mainloop()
@@ -68,6 +68,7 @@ class App(tk.CTk):
             self.pages.append(p3)
             print('self.pages in load_page3:',self.pages)
             p3.pack(pady=10, fill='both', expand=True)
+            self.footer.btn_next.configure(text="Plot me!")
     
     def move_next_page(self):
         if not self.count_pages > len(self.pages) - 2:
@@ -94,10 +95,10 @@ class Footer(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
         self.footerFrame = tk.CTkFrame(self)
-        btn_back = tk.CTkButton(self.footerFrame, text="Back", font=("Bold", 12), command = parent.move_back_page)
-        btn_next = tk.CTkButton(self.footerFrame, text="Next", font=("Bold", 12), command = parent.move_next_page)
-        btn_back.pack(side=tk.LEFT, padx=20)
-        btn_next.pack(side=tk.RIGHT, padx=20)
+        self.btn_back = tk.CTkButton(self.footerFrame, text="Back", font=("Bold", 12), command = parent.move_back_page)
+        self.btn_next = tk.CTkButton(self.footerFrame, text="Next", font=("Bold", 12), command = parent.move_next_page)
+        self.btn_back.pack(side=tk.LEFT, padx=20)
+        self.btn_next.pack(side=tk.RIGHT, padx=20)
         self.footerFrame.pack(expand=True, fill='both')
 
 class Page_1(tk.CTkFrame):
@@ -278,10 +279,10 @@ class Page_2(tk.CTkFrame):
 
     def checkbox_frame_event(self, index):
         print(f"checkbox frame modified: frame: {self.listbox_frames[index]} items:{self.listbox_frames[index].get_checked_items_id()}")
-        global us
-        us = User_selections(self)
+        global user_selections
+        user_selections = User_selections(self)
         for i in range(len(self.listbox_frames)):
-            us.add_to_list(self.listbox_frames[i].get_checked_items_id())
+            user_selections.add_to_list(self.listbox_frames[i].get_checked_items_id())
 
 class User_selections(): # Flyt til bedre sted i koden, evt til egen fil?
     def __init__(self, parent):
@@ -296,19 +297,35 @@ class Page_3(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
 
+        #TODO Dette skal ikke bruges, sæt ind i try: hvis det en dag skal...:
+        # lbl = tk.CTkLabel(self, text=f"{final_table_id}{us.sel} - metafields: {meta_fields} global_table_name: {global_table_name} final_table_id: {final_table_id}")
+        # lbl.pack(side=tk.TOP, padx=10, fill='both')
+        
         print("Page_3_Content running")
+        
+        # btn = tk.CTkButton(parent, text="plot me!").pack(side=tk.LEFT, fill='both')
+
+        if user_selections is not None:
+            #Create json based on selections
+            payload = self.create_json_payload()
+            
+            #API Kald
+            results = get_table_data(payload)
+
+            #Plot
+            plot_results(results)
+            
+    def create_json_payload(self):
         #TODO Find bedre løsning end try?
         try: # try er lavet for page 2 og 3, for at undgå fejl under første opstart, hvor variable ikke er blevet sat.
-            lbl = tk.CTkLabel(self, text=f"{final_table_id}{us.sel} - metafields: {meta_fields} global_table_name: {global_table_name} final_table_id: {final_table_id}")
-            lbl.pack(side=tk.TOP, padx=10, fill='both')
             fieldlist = []
 
             #Byg JSON
-            # TODO: Lidt rodet det her + bedre navne? + Træk ud i funktion!!
+            # TODO: Lidt rodet det her + bedre navne?
             for field_index,field in enumerate(meta_fields):
                 itemlist = []
                 itemdict = {}
-                for selected_id in us.sel[field_index]:
+                for selected_id in user_selections.sel[field_index]:
                     itemlist.append(str(selected_id))
                     itemdict['code'] = field
                     itemdict['values'] = itemlist
@@ -320,16 +337,12 @@ class Page_3(tk.CTkFrame):
             payload['variables'] = fieldlist
             print('payload',payload)
 
-            #API Kald
-            results = get_table_data(payload)
-
-            #Plot
-            plot_results(results)
-            #TODO BUG: Hvis man trykker baglæns herfra, nulstilles x og y ikke ?! Fix
+            return payload
 
         except:
             pass
-        
+
+# payload template
 global payload
 payload = {
     "table": "SKIB74",

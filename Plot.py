@@ -6,7 +6,7 @@
 
 from matplotlib import pyplot as plt
 import os
-
+import shutil
 # global x
 # global y
 x = []
@@ -33,7 +33,11 @@ def plot_results(results):
     # print('myData',newData)
     print("newData", newData)
     print("newData len", len(newData))
-    for dat in newData:
+
+    shutil.rmtree(f"{os.path.join(os.getcwd())}\\img") #TODO brug join i stedet for f string?
+    os.mkdir(f"{os.path.join(os.getcwd())}\\img")
+    
+    for index,dat in enumerate(newData):
         # print(dat)
         if len(dat) > 0:
             dat2 = dat.split(";")
@@ -66,14 +70,24 @@ def plot_results(results):
             # x.append('test x')
             # print("TEST 2")
         # print(test)
-    print("lenght x:",len(x))
-    print('x',x)
-    print("lenght y:",len(y))
-    print('y',y)
+        print("lenght x:",len(x))
+        print('x',x)
+        print("lenght y:",len(y))
+        print('y',y)
 
-    #barh = liggende søjler
-    plt.barh(x, y,color='#0000FF',label='diagram label')
+        #barh = liggende søjler
+        # plt.barh(x, y,color='#0000FF',label='diagram label')
+        plt.barh(x, y,color='#0000FF')
 
+        print(f"{os.path.join(os.getcwd())}\\img\\img{index}.png")
+        save_img_path = f"{os.path.join(os.getcwd())}\\img\\img{index}.png"
+        # [f"{i:03}" for i in range(121)]
+        # save_img_path = f"../img/img_test{index:03}.png"
+        plt.savefig(save_img_path)
+
+        # C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img\img_test000.png
+        #TODO opret speed var:
+        plt.pause(0.1)
 
 
     # plt.xlabel('x-akse', fontsize='small') #hvorfor virker fontsize ikke? tjek version af pyplot...
@@ -81,14 +95,17 @@ def plot_results(results):
 
     # # behøver ikke ylabel ved barh type:
     # # plt.ylabel('y-akse')
-
-    plt.title('Mit diagram')
+    headings = myData[:1]
+    plt.title(headings)
 
     # #No artists with labels found to put in legend.
     # #Note that artists whose label start with an underscore are ignored when legend() is called with no argument.
     plt.legend()
 
     plt.show()
+
+if __name__ == '__main__':
+    print("main")
         # return x
 
     # print("????")

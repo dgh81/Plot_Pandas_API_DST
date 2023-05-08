@@ -1,1 +1,0 @@
-print([f"{i:03}" for i in range(121)])
