@@ -150,7 +150,7 @@ class Page_1(tk.CTkFrame):
         meta_fields = get_table_metadata_fields(table_name)
         self.clear_selections(self.frame_4, self.level_4_buttons)
         self.create_level_4_buttons(get_table_metadata_fields(table_name))
-    
+    #test
     def create_level_4_buttons(self, metadata_fields): #TODO: ubrugte variable !!
         print('metadata_fields',metadata_fields)
         for index, level_4_subject in enumerate(metadata_fields):
