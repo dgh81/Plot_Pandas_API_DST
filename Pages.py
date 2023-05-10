@@ -1,5 +1,4 @@
 import customtkinter as tk
-# from App import user_selections
 from Api import get_table_data
 from Api import get_table_name
 from Api import get_subject
@@ -9,20 +8,17 @@ import Custom_listbox
 from User_selections import User_selections
 from Plot import plot_results
 from Animation import start_submit_thread
-# from Api import subjects
-
 
 global_table_name = ''
-final_table_id = None
-meta_fields = []
+global_final_table_id = None
+global_meta_fields = []
 
-user_selections = None
+global_user_selections = None
 
 class Page_1(tk.CTkFrame):
     def __init__(self, parent, subjects):
         super().__init__(parent)
         self.subjects = subjects
-
 
         tk.CTkLabel(self, text="Label: Vælg datasæt").pack(side=tk.TOP, padx=10)
         # self.configure(fg_color='orange')
@@ -75,8 +71,6 @@ class Page_1(tk.CTkFrame):
         self.frame_4.rowconfigure(subjects_tuple, weight=1)
 
     def set_level_1_button_colors(self, index):
-        # print(tk.get_appearance_mode())
-        # print(tk.ThemeManager._currently_loaded_theme)
         # Button color reset and set clicked:
         for i in range(len(self.level_1_buttons)):
             self.level_1_buttons[i].configure(fg_color='#242424') #3a7ebf
@@ -103,7 +97,6 @@ class Page_1(tk.CTkFrame):
         for level_2_subjects in subs:
             for index, level_2_subject in enumerate(level_2_subjects['subjects']):
                 btn_text = level_2_subject['description']
-                selected_level_2_ID = level_2_subject['id'] #TODO: Ubrugt variabel !!
                 sub_button = tk.CTkButton(self.frame_2, text=btn_text, command=lambda callback=level_2_subject, callback2=index: self.level_2_click(callback, callback2))
                 sub_button.grid(row=index, column=0, sticky='nsew', padx=2, pady=2)
                 self.level_2_buttons[index] = sub_button
@@ -117,7 +110,7 @@ class Page_1(tk.CTkFrame):
     def create_level_3_buttons(self, level_2_sub):
         level_3_subjects = get_subject(level_2_sub['id'])
         if len(level_3_subjects[0]['subjects']) == 0:
-            print("empty!","Using level 2 code:",level_3_subjects[0]['id']) # TODO: Filtrer tomme fra eller hva?
+            print("empty!","Using level 2 code:",level_3_subjects[0]['id']) # TODO BUG: Filtrer tomme fra eller hva?
         for index, level_3_subject in enumerate(level_3_subjects[0]['subjects']):
             btn_text = level_3_subject['description']
             sub_button = tk.CTkButton(self.frame_3, text=btn_text, command=lambda callback=level_3_subject, callback2=index: self.level_3_click(callback, callback2))
@@ -139,19 +132,20 @@ class Page_1(tk.CTkFrame):
 
     def level_3_click(self, level_3_sub, index):
         id = str(level_3_sub['id'])
-        global final_table_id
-        final_table_id = id
+        global global_final_table_id
+        global_final_table_id = id
 
         self.set_level_3_button_colors(index)
-        #TODO: Brug global_table_name?
-        table_name = get_table_name(id)
+        
+        level_3_table_name = get_table_name(id)
 
-        global meta_fields #TODO: Overvej en anden måde end global, meta_fields bruges under Page_2...
-        meta_fields = get_table_metadata_fields(table_name)
+        global global_meta_fields #TODO: Overvej en anden måde end global = User_selections...
+        global_meta_fields = get_table_metadata_fields(level_3_table_name)
         self.clear_selections(self.frame_4, self.level_4_buttons)
-        self.create_level_4_buttons(get_table_metadata_fields(table_name))
-    #test
-    def create_level_4_buttons(self, metadata_fields): #TODO: ubrugte variable !!
+        self.create_level_4_buttons(level_3_table_name)
+
+    def create_level_4_buttons(self, table_name):
+        metadata_fields = get_table_metadata_fields(table_name)
         print('metadata_fields',metadata_fields)
         for index, level_4_subject in enumerate(metadata_fields):
             btn_text = metadata_fields[index]
@@ -162,38 +156,32 @@ class Page_1(tk.CTkFrame):
 class Page_2(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
-        # self.final_table_id = final_table_id
+        self.listbox_frames = []
+        self.grid_rowconfigure(0, weight=1)
+        self.columnconfigure(2, weight=1)
 
         print("Page_2_Content running")
 
         lbl = tk.CTkLabel(self, text="test2")
         lbl.pack(side=tk.TOP, padx=10, fill='both')
-
-        self.listbox_frames = []
-
-        lbl.configure(text=final_table_id, fg_color="grey")
-
-        self.grid_rowconfigure(0, weight=1)
-        self.columnconfigure(2, weight=1)
-        print("Page 2 final_table_name:", final_table_id)
-        print('Page 2 meta_fields:', meta_fields)
+        lbl.configure(text=global_final_table_id, fg_color="grey")
 
         try:
-            table_name = get_table_name(final_table_id)
-            print('table_name:',table_name)
+            table_name = get_table_name(global_final_table_id)
+            # print('table_name:',table_name)
             listbox_content = []
 
-            for index in range(len(meta_fields)):
+            for index in range(len(global_meta_fields)):
                 scrollable_checkbox_frame = Custom_listbox.ScrollableCheckBoxFrame(master=self, width=2, command=lambda callback=index: self.checkbox_frame_event(callback), item_list=[])
                 self.listbox_frames.append(scrollable_checkbox_frame)
                 scrollable_checkbox_frame.pack(side='left', fill='both', expand=True)
 
             for index,listbox_frame in enumerate(self.listbox_frames):
-                num_fields = len(get_table_metadata_field_types(table_name, index))
-                print(num_fields)
+                num_meta_fields = len(get_table_metadata_field_types(table_name, index))
+                # print(num_meta_fields)
 
                 listbox_content.append(get_table_metadata_field_types(table_name, index))
-                for i in range(num_fields):
+                for i in range(num_meta_fields):
                     item = listbox_content[index][i]['text']
                     id = listbox_content[index][i]['id']
                     listbox_frame.add_item(item,id)
@@ -203,10 +191,12 @@ class Page_2(tk.CTkFrame):
 
     def checkbox_frame_event(self, index):
         print(f"checkbox frame modified: frame: {self.listbox_frames[index]} items:{self.listbox_frames[index].get_checked_items_id()}")
-        global user_selections
-        user_selections = User_selections(self)
+        #TODO : fix det her, global og ny klasse på samme tid var ik meningen... Vi skulle have haft fjernet globals.
+        # Lav singleton klasse eller er det endu mere kludret end at bevare globals? https://stackoverflow.com/questions/6760685/creating-a-singleton-in-python
+        global global_user_selections
+        global_user_selections = User_selections(self)
         for i in range(len(self.listbox_frames)):
-            user_selections.add_to_list(self.listbox_frames[i].get_checked_items_id())
+            global_user_selections.add_to_list(self.listbox_frames[i].get_checked_items_id())
 
 class Page_3(tk.CTkFrame):
     def __init__(self, parent):
@@ -219,8 +209,8 @@ class Page_3(tk.CTkFrame):
         print("Page_3_Content running")
         
         # btn = tk.CTkButton(parent, text="plot me!").pack(side=tk.LEFT, fill='both')
-        print('user_selections:', user_selections)
-        if user_selections is not None:
+        print('user_selections:', global_user_selections)
+        if global_user_selections is not None:
             #Create json based on selections
             payload = self.create_json_payload()
             print('payload',payload)
@@ -242,18 +232,18 @@ class Page_3(tk.CTkFrame):
 
             #Byg JSON
             # TODO: Lidt rodet det her + bedre navne?
-            print('self.meta_fields',meta_fields)
-            for field_index,field in enumerate(meta_fields):
+            print('self.meta_fields',global_meta_fields)
+            for field_index,field in enumerate(global_meta_fields):
                 itemlist = []
                 itemdict = {}
-                for selected_id in user_selections.sel[field_index]:
+                for selected_id in global_user_selections.sel[field_index]:
                     itemlist.append(str(selected_id))
                     itemdict['code'] = field
                     itemdict['values'] = itemlist
                 fieldlist.append(itemdict)
             # print('fieldlist:',fieldlist)
-
-            payload['table'] = get_table_name(final_table_id)
+            payload = self.payload()
+            payload['table'] = get_table_name(global_final_table_id)
             payload['format'] = "CSV"
             payload['variables'] = fieldlist
             print('payload',payload)
@@ -263,30 +253,30 @@ class Page_3(tk.CTkFrame):
         except:
             pass
 
-        
-# payload template
-global payload
-payload = {
-    "table": "SKIB74",
-    "format": "CSV",
-    "variables": [
-        {
-            "code": "LANDGRP",
-            "values": [
-            "00"
-            ]
-        },
-        {
-            "code": "GODS",
-            "values": [
-            "100"
-            ]
-        },
-        {
-            "code": "Tid",
-            "values": [
-            "2000K1"
+    # payload template
+    def payload(self):
+        _payload = {
+            "table": "SKIB74",
+            "format": "CSV",
+            "variables": [
+                {
+                    "code": "LANDGRP",
+                    "values": [
+                    "00"
+                    ]
+                },
+                {
+                    "code": "GODS",
+                    "values": [
+                    "100"
+                    ]
+                },
+                {
+                    "code": "Tid",
+                    "values": [
+                    "2000K1"
+                    ]
+                }
             ]
         }
-    ]
-}
+        return _payload

@@ -3,35 +3,21 @@
 
 #TODO lav img001, img002 etc både i navn og i pattern ffmpeg
 
-from Footer import Footer
+#TODO flyt alle globals i Pages ind i objektet for User_selections ? tilgå uden globals?
+
+#TODO: Lav navngivne variable i funk input ALLE STEDER! Først når alt er refac'd
+        # FX def sum(a=a, b=b)
+
 from Api import subjects
-from Api import get_subject
-from Api import get_table_name
-from Api import get_table_data
-from Api import get_table_metadata_fields
-from Api import get_table_metadata_field_types
-from Plot import plot_results
-from Animation import start_submit_thread
+from Footer import Footer
 from Pages import Page_3
 from Pages import Page_2
 from Pages import Page_1
 
-import Custom_listbox
-
 import customtkinter as tk
-
-from User_selections import User_selections
 
 tk.set_appearance_mode('dark')
 tk.set_default_color_theme('dark-blue')
-
-# global_table_name = ''
-# final_table_id = None
-# meta_fields = []
-
-# user_selections = None
-
-# listboxes_has_been_created = False
 
 class App(tk.CTk):
     def __init__(self, title, geometry):
@@ -51,7 +37,7 @@ class App(tk.CTk):
         
         p2 = Page_2(self)
         self.add_page(p2)
-        #TODO: Lav navngivne variable i funk input som herunder ALLE STEDER! Først når alt er refac'd
+        
         p3 = Page_3(self)
         self.add_page(p3)
 
