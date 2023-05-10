@@ -2,8 +2,8 @@ import threading
 import sys
 import os
 import subprocess
-import tkinter as tk
-root = tk.Tk()
+import customtkinter as tk
+# root = tk.Tk()
 
 def convert():
     # s = f"ffmpeg -sseof -00:00:30 -display_hflip -nostdin -i original.mp4 -crf 30 -s 720x360 {output_sv.get()}{file_e} 2>C:\myffmpeg\log.txt"
@@ -49,12 +49,12 @@ def start_submit_thread():
     submit_thread.daemon = True
     # progressbar.start()
     submit_thread.start()
-    root.after(20, check_submit_thread)
+    tk.after(20, check_submit_thread)
 
 def check_submit_thread():
     print("checking submit thread...")
     if submit_thread.is_alive():
-        root.after(20, check_submit_thread)
+        tk.after(20, check_submit_thread)
     else:
         print("done")
         # progressbar.stop()

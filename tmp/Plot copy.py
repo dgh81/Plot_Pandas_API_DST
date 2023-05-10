@@ -1,4 +1,4 @@
-from api import result
+from Api import result
 # from gui2 import result
 # For fun: tjek pythons "anti gravity" :D
 

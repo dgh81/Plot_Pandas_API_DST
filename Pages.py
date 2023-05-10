@@ -1,21 +1,16 @@
-
-#TODO Implementér farvekodet fejl etc i konsollen...
-
-from api import subjects
-from api import get_subject
-from api import get_table_name
-from api import get_table_data
-from api import get_table_metadata_fields
-from api import get_table_metadata_field_types
-from Plot import plot_results
-from animation import start_submit_thread
-
-import custom_listbox
-
 import customtkinter as tk
+# from App import user_selections
+from Api import get_table_data
+from Api import get_table_name
+from Api import get_subject
+from Api import get_table_metadata_fields
+from Api import get_table_metadata_field_types
+import Custom_listbox
+from User_selections import User_selections
+from Plot import plot_results
+from Animation import start_submit_thread
+# from Api import subjects
 
-tk.set_appearance_mode('dark')
-tk.set_default_color_theme('dark-blue')
 
 global_table_name = ''
 final_table_id = None
@@ -23,91 +18,12 @@ meta_fields = []
 
 user_selections = None
 
-listboxes_has_been_created = False
-
-class App(tk.CTk):
-    def __init__(self, title, geometry):
-        # App setup
-        super().__init__()
-        self.title(title)
-        self.geometry(f"{geometry[0]}x{geometry[1]}")
-        self.minsize(geometry[0], geometry[1])
-        
-        self.count_pages = 0
-
-        # Pages setup:
-        self.pages = []
-        p1 = Page_1(self)
-        p1.pack(pady=10, fill='both', expand=True) # Vis side 1:
-        self.add_page(p1)
-        
-        p2 = Page_2(self)
-        self.add_page(p2)
-
-        p3 = Page_3(self)
-        self.add_page(p3)
-
-        # Footer:
-        self.footer = Footer(self)
-        self.footer.pack(side=tk.BOTTOM, pady=20, padx=20, fill='both')
-
-        # Run app
-        self.mainloop()
-
-    def add_page(self, page):
-        self.pages.append(page)
-
-    def load_page(self):
-        if self.count_pages == 0:
-            p1 = Page_1(self)
-            self.pages.append(p1)
-            p1.pack(pady=10, fill='both', expand=True)
-        if self.count_pages == 1:
-            p2 = Page_2(self)
-            self.pages.append(p2)
-            print('self.pages in load_page2:',self.pages)
-            p2.pack(pady=10, fill='both', expand=True)
-        if self.count_pages == 2:
-            p3 = Page_3(self)
-            self.pages.append(p3)
-            print('self.pages in load_page3:',self.pages)
-            p3.pack(pady=10, fill='both', expand=True)
-            self.footer.btn_next.configure(text="Plot me!")
-    
-    def move_next_page(self):
-        if not self.count_pages > len(self.pages) - 2:
-            for page in self.pages:
-                print("forgetting:",page)
-                page.pack_forget()
-            self.count_pages += 1
-            page = self.pages[self.count_pages]
-            self.pages.remove(page)
-            self.load_page()
-
-    def move_back_page(self):
-        if not self.count_pages == 0:
-            for page in self.pages:
-                print("forgetting:",page)
-                page.pack_forget()
-            # count_pages er faktisk mere page_index... TODO: rename
-            self.count_pages -= 1
-            page = self.pages[self.count_pages]
-            self.pages.remove(page)
-            self.load_page()
-
-class Footer(tk.CTkFrame):
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.footerFrame = tk.CTkFrame(self)
-        self.btn_back = tk.CTkButton(self.footerFrame, text="Back", font=("Bold", 12), command = parent.move_back_page)
-        self.btn_next = tk.CTkButton(self.footerFrame, text="Next", font=("Bold", 12), command = parent.move_next_page)
-        self.btn_back.pack(side=tk.LEFT, padx=20)
-        self.btn_next.pack(side=tk.RIGHT, padx=20)
-        self.footerFrame.pack(expand=True, fill='both')
-
 class Page_1(tk.CTkFrame):
-    def __init__(self, parent):
+    def __init__(self, parent, subjects):
         super().__init__(parent)
+        self.subjects = subjects
+
+
         tk.CTkLabel(self, text="Label: Vælg datasæt").pack(side=tk.TOP, padx=10)
         # self.configure(fg_color='orange')
         # LEVEL 1 FRAME:
@@ -132,7 +48,7 @@ class Page_1(tk.CTkFrame):
         self.frame_1 = tk.CTkFrame(self)
         self.frame_1.pack(side='left', fill="both", expand=True, padx=10, pady=10)
         self.frame_1.columnconfigure(0, weight=1)
-        subjects_tuple = tuple(range(len(subjects)))
+        subjects_tuple = tuple(range(len(self.subjects)))
         self.frame_1.rowconfigure(subjects_tuple, weight=1)
 
 
@@ -246,6 +162,7 @@ class Page_1(tk.CTkFrame):
 class Page_2(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
+        # self.final_table_id = final_table_id
 
         print("Page_2_Content running")
 
@@ -258,13 +175,16 @@ class Page_2(tk.CTkFrame):
 
         self.grid_rowconfigure(0, weight=1)
         self.columnconfigure(2, weight=1)
+        print("Page 2 final_table_name:", final_table_id)
+        print('Page 2 meta_fields:', meta_fields)
 
         try:
             table_name = get_table_name(final_table_id)
+            print('table_name:',table_name)
             listbox_content = []
 
             for index in range(len(meta_fields)):
-                scrollable_checkbox_frame = custom_listbox.ScrollableCheckBoxFrame(master=self, width=2, command=lambda callback=index: self.checkbox_frame_event(callback), item_list=[])
+                scrollable_checkbox_frame = Custom_listbox.ScrollableCheckBoxFrame(master=self, width=2, command=lambda callback=index: self.checkbox_frame_event(callback), item_list=[])
                 self.listbox_frames.append(scrollable_checkbox_frame)
                 scrollable_checkbox_frame.pack(side='left', fill='both', expand=True)
 
@@ -288,15 +208,6 @@ class Page_2(tk.CTkFrame):
         for i in range(len(self.listbox_frames)):
             user_selections.add_to_list(self.listbox_frames[i].get_checked_items_id())
 
-class User_selections(): # Flyt til bedre sted i koden, evt til egen fil?
-    def __init__(self, parent):
-        self.parent = parent
-        self.sel = []
-    
-    def add_to_list(self, item):
-        self.sel.append(item)
-        
-
 class Page_3(tk.CTkFrame):
     def __init__(self, parent):
         super().__init__(parent)
@@ -308,20 +219,22 @@ class Page_3(tk.CTkFrame):
         print("Page_3_Content running")
         
         # btn = tk.CTkButton(parent, text="plot me!").pack(side=tk.LEFT, fill='both')
-
+        print('user_selections:', user_selections)
         if user_selections is not None:
             #Create json based on selections
             payload = self.create_json_payload()
-            
+            print('payload',payload)
             #API Kald
             results = get_table_data(payload)
+            print('results:',results)
 
             #Plot
             plot_results(results)
 
-            video_btn = tk.CTkButton(parent, text="video me!", command=start_submit_thread).pack(side=tk.LEFT, fill='both')
+            self.create_json_payload()
 
-            
+            video_btn = tk.CTkButton(parent, text="video me!", command=start_submit_thread).pack(side=tk.LEFT, fill='both')
+    
     def create_json_payload(self):
         #TODO Find bedre løsning end try?
         try: # try er lavet for page 2 og 3, for at undgå fejl under første opstart, hvor variable ikke er blevet sat.
@@ -329,6 +242,7 @@ class Page_3(tk.CTkFrame):
 
             #Byg JSON
             # TODO: Lidt rodet det her + bedre navne?
+            print('self.meta_fields',meta_fields)
             for field_index,field in enumerate(meta_fields):
                 itemlist = []
                 itemdict = {}
@@ -349,6 +263,7 @@ class Page_3(tk.CTkFrame):
         except:
             pass
 
+        
 # payload template
 global payload
 payload = {
@@ -375,5 +290,3 @@ payload = {
         }
     ]
 }
-
-App(title='Project', geometry=(1500,800))
