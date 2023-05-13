@@ -3,6 +3,16 @@ import csv
 import json
 import requests
 import codecs
+from contextlib import closing
+# import csv
+from codecs import iterdecode
+import urllib.request
+
+import pandas as pd
+from matplotlib import pyplot as plt
+from sklearn.tree import DecisionTreeRegressor
+from sklearn import preprocessing
+
 # https://www.dst.dk/da/Statistik/brug-statistikken/muligheder-i-statistikbanken/api#tabellerogemner
 # https://www.ft.dk/-/media/sites/statsrevisorerne/dokumenter/2020/beretning-3-2020-om-danmarks-statistiks-kvalitet-og-produktivitet.ashx
 
@@ -106,6 +116,8 @@ for sub in subjects:
 
 
 
+# HVORFOR BRUGER NOGLE DATA OG ANDRE JSON UNDER PAYLOAD DELEN???
+
 # def get_subject(subjectID):
 def get_subject(subjectID):
     payload_get_subject = {
@@ -196,6 +208,86 @@ def get_table_metadata_fields(table_name):
 
 #TODO: Denne skal bruge args som nr 2 argument, hvori variables bor, json herunder skal skabes dynamisk...
 def get_table_data(payload):
+
+    print("running get_table_data")
+    result = requests.post('https://api.statbank.dk/v1/data/', json=payload) #CSV?delimiter=Semicolon
+    result = result.text
+    
+
+    # url = "https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1"
+
+    #TODO: Byg url fra payload
+    #TODO: Fjern fil hvis den allerede eksisterer (overskrives ikke automatiskt...)
+    csv_file = urllib.request.urlretrieve('https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1', "test.csv")
+
+    # print(result)
+    # filepath = 'test.csv'
+    # dataframe = pd.read_csv(filepath)
+    
+    # dataframe.columns
+    # print(dataframe.columns)
+    # dataframe
+
+    return result
+
+# get_table_data()
+def myPandas():
+    csv_file = urllib.request.urlretrieve('https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1', "test.csv")
+
+    print(result)
+    filepath = 'test.csv'
+    dataframe = pd.read_csv(filepath,sep='[;]', header=0, engine='python', nrows=60)
+    data = dataframe
+    data = data.dropna(axis=0)
+    print(data.columns)
+
+    y = data.INDHOLD
+    print(y)
+
+    features = ['OMRÅDE', 'KØN', 'ALDER', 'STATSB', 'TID']
+
+    X = data[features]
+    print(X.describe())
+    print(X.head())
+
+
+    # le = preprocessing.LabelEncoder()
+    # X = le.fit_transform(X)
+    # print(X.head())
+
+    # model = DecisionTreeRegressor(random_state=1)
+
+    # model.fit(X, y)
+
+    # print(model.predict(X.head()))
+
+
+    # x = data['STATSB'].values.tolist()
+    # y = data['INDHOLD'].values.tolist()
+
+    # for index,item in enumerate(y):
+    #     print(item)
+
+# myPandas()
+    
+        # y[index] = float(y[index].replace(',','.'))
+    # print('x: ',x)
+    # print('y: ',y)
+
+    # plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
+    # plt.xlabel('x-akse', fontsize='small') #hvorfor virker fontsize ikke? tjek version af pyplot...
+    # plt.xticks(rotation=90)
+    # plt.title('Mit diagram')
+    # plt.legend()
+    # plt.show()
+
+
+    # dataframe.columns
+    # print(dataframe.columns)
+
+# http://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=*&K%C3%98N=*&ALDER=*&STATSB=*&Tid=*
+# https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1
+
     # payload = {
     #     "table": f"{table_name}",
     #     "format": "CSV",
@@ -215,12 +307,3 @@ def get_table_data(payload):
     #     ],
 
     # }
-    print("running get_table_data")
-    result = requests.post('https://api.statbank.dk/v1/data/', json=payload)
-    result = result.text
-    # print(result)
-
-    print(result)
-    return result
-
-# get_table_data()
