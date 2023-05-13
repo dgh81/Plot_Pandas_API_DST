@@ -212,7 +212,7 @@ class Page_3(tk.CTkFrame):
         print('user_selections:', global_user_selections)
         if global_user_selections is not None:
             #Create json based on selections
-            payload = self.create_json_payload()
+            payload = self.modify_json_payload()
             print('payload',payload)
             #API Kald
             results = get_table_data(payload)
@@ -221,17 +221,18 @@ class Page_3(tk.CTkFrame):
             #Plot
             plot_results(results)
 
-            self.create_json_payload()
+            self.modify_json_payload()
 
             video_btn = tk.CTkButton(parent, text="video me!", command=start_submit_thread).pack(side=tk.LEFT, fill='both')
     
-    def create_json_payload(self):
+    def modify_json_payload(self):
         #TODO Find bedre løsning end try?
         try: # try er lavet for page 2 og 3, for at undgå fejl under første opstart, hvor variable ikke er blevet sat.
             fieldlist = []
 
             #Byg JSON
             # TODO: Lidt rodet det her + bedre navne?
+            #TODO: læs om funktionen DictReader, måske den kan bruges her?
             print('self.meta_fields',global_meta_fields)
             for field_index,field in enumerate(global_meta_fields):
                 itemlist = []
@@ -244,7 +245,8 @@ class Page_3(tk.CTkFrame):
             # print('fieldlist:',fieldlist)
             payload = self.payload()
             payload['table'] = get_table_name(global_final_table_id)
-            payload['format'] = "CSV"
+            # payload['format'] = "CSV"
+            payload['format'] = "BULK"
             payload['variables'] = fieldlist
             print('payload',payload)
 
