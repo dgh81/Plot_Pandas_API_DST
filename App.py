@@ -54,7 +54,7 @@ class App(tk.CTk):
 
     def load_page(self):
         if self.count_pages == 0:
-            p1 = Page_1(self)
+            p1 = Page_1(self, subjects)
             self.pages.append(p1)
             p1.pack(pady=10, fill='both', expand=True)
         if self.count_pages == 1:

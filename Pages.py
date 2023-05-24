@@ -246,7 +246,7 @@ class Page_3(tk.CTkFrame):
             payload = self.payload()
             payload['table'] = get_table_name(global_final_table_id)
             # payload['format'] = "CSV"
-            payload['format'] = "BULK"
+            payload['format'] = "BULK" #TODO Var der forskel på BULK og CSV?
             payload['variables'] = fieldlist
             print('payload',payload)
 
