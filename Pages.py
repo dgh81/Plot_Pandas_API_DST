@@ -243,11 +243,12 @@ class Page_3(tk.CTkFrame):
                     itemdict['values'] = itemlist
                 fieldlist.append(itemdict)
             # print('fieldlist:',fieldlist)
+            
             payload = self.payload()
             payload['table'] = get_table_name(global_final_table_id)
-            # payload['format'] = "CSV"
-            payload['format'] = "BULK" #TODO Var der forskel på BULK og CSV?
+            payload['format'] = "BULK"
             payload['variables'] = fieldlist
+
             print('payload',payload)
 
             return payload

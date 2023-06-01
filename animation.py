@@ -10,15 +10,16 @@ def convert():
     print("calling convert...")
     try:
         #TODO Opret dynamisk sti til input parameter herunder... Husk også at lave 001, 002 til images...
+        # save_img_path = f"{os.path.join(os.getcwd())}\\img\\img{index}.png"
         results = subprocess.call([
             'ffmpeg',
             '-framerate', '2',
             '-pattern_type', 'sequence',
-            '-i', 'C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img\img%1d.png',
+            '-i', f'{os.path.join(os.getcwd())}\\img\\img%3d.png',
             '-s:v', '1920x1080',
             '-c:v', 'libx264',
             '-pix_fmt', 'yuv420p',
-            'C:\dat4sem\Python\weekTwo\Plot_Pandas_API_DST\img\out1.mp4'])
+            f'{os.path.join(os.getcwd())}\\img\\out1.mp4'])
             # 'ffmpeg',
             # '-ss', '00:19:15', # denne slags tider må gerne sættes direkte i sekunder, fx 1,5 min = 90 (ingen : eller noget)
             # # '-display_hflip',

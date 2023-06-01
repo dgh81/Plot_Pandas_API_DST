@@ -91,8 +91,8 @@ def plot_results(results):
         plt.bar(x, y,color='#0000FF')
         # plt.legend(title="test")
 
-        print(f"{os.path.join(os.getcwd())}\\img\\img{index}.png")
-        save_img_path = f"{os.path.join(os.getcwd())}\\img\\img{index}.png"
+        print(f"{os.path.join(os.getcwd())}\\img\\img{index:03d}.png")
+        save_img_path = f"{os.path.join(os.getcwd())}\\img\\img{index:03d}.png"
         # [f"{i:03}" for i in range(121)]
         # save_img_path = f"../img/img_test{index:03}.png"
         plt.savefig(save_img_path)
