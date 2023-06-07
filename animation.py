@@ -20,26 +20,12 @@ def convert():
             '-c:v', 'libx264',
             '-pix_fmt', 'yuv420p',
             f'{os.path.join(os.getcwd())}\\img\\out1.mp4'])
-            # 'ffmpeg',
-            # '-ss', '00:19:15', # denne slags tider må gerne sættes direkte i sekunder, fx 1,5 min = 90 (ingen : eller noget)
-            # # '-display_hflip',
-            # '-nostdin',
-            # '-i', input_sv.get(),
-            # '-crf', '15', # 9 er minimum?
-            # '-s', '1080x720', # yt standard?
-            # '-an', # no audio...
-            # '-t', '00:00:45', # time after -ss to include...
-            # '-vf','setpts=16*PTS', # slow mo... 8 = amount
-            # 'test.mp4'])
-            # f"{output_sv.get()}{file_e}"])
+
 
         if results:
             print("Failure")
-            # done.set("Working on it...")
         else:
             print("Success!")
-            # done.set("Done!")
-
         
     except:
         print("Failure")
@@ -49,7 +35,6 @@ def start_submit_thread():
     global submit_thread
     submit_thread = threading.Thread(target=convert)
     submit_thread.daemon = True #TODO Hvad er daemon?
-    # progressbar.start()
     submit_thread.start()
     tk.after(20, check_submit_thread)
 
@@ -59,6 +44,3 @@ def check_submit_thread():
         tk.after(20, check_submit_thread)
     else:
         print("done")
-        # progressbar.stop()
-
-# start_submit_thread()

@@ -67,12 +67,6 @@ payload2 = {
 'valuePresentation': 'Value'
 }
 
-# rr =rq.post('https://api.statbank.dk/v1/data', data=payload)
-# print(rr.text)
-# print(rr)
-# print(rr.headers)
-
-# Brug json i stedet for data!!!!!!
 
 result = requests.post('https://api.statbank.dk/v1/data/', json=payload)
 
@@ -111,13 +105,8 @@ for sub in subjects:
     for s in sub["subjects"]:
         if len(s['subjects']) > 0:
             pass
-            # print(s["id"])
-            #TODO mangler et lag sunjects mere...
-            #TDO Nej tag eet lag ad gangen
 
 
-
-# HVORFOR BRUGER NOGLE DATA OG ANDRE JSON UNDER PAYLOAD DELEN???
 
 # def get_subject(subjectID):
 def get_subject(subjectID):
@@ -126,11 +115,10 @@ def get_subject(subjectID):
             f"{subjectID}"
         ]
     }
-    rr = requests.post('https://api.statbank.dk/v1/subjects', data=payload_get_subject).json()
-    # print('rr:', rr)
-    return rr
+    subject = requests.post('https://api.statbank.dk/v1/subjects', data=payload_get_subject).json()
 
-# get_subject(2)
+    return subject
+
 
 
 def get_table_name(table_id):
@@ -139,36 +127,10 @@ def get_table_name(table_id):
             f"{table_id}"
         ]
     }
-    rr = requests.post('https://api.statbank.dk/v1/tables', data=payload_get_table_name).json()
-    print(rr)
-    # print(type(rr))
-    for table in rr:
-        pass
-        # print(table)
-        print(table['id'], table['variables'])
-    return table['id']
+    table_name = requests.post('https://api.statbank.dk/v1/tables', data=payload_get_table_name).json()
+    return table_name[0]['id']
     
 
-# get_table_name(1)
-
-# def get_table_metadata(table_name):
-#     payload = {
-#     "table": f"{table_name}",
-#     "format": "JSON"
-#     }
-#     result = requests.post('https://api.statbank.dk/v1/tableinfo', json=payload).json()
-#     vars = []
-#     try:
-#         for meta in result['variables']:
-#             print(meta['id'])
-#             vars.append(meta["id"])
-#             for val in meta["values"]:
-#                 print(val)
-#                 pass
-        
-#     except:
-#         pass
-#     return vars
 
 def get_table_metadata_field_types(table_name, field_id):
     payload = {
@@ -176,19 +138,14 @@ def get_table_metadata_field_types(table_name, field_id):
     "format": "JSON"
     }
     result = requests.post('https://api.statbank.dk/v1/tableinfo', json=payload).json()
-    # TODO Er hele try for delen ikke overflødig?
+
     table_field_types = []
-    # print(result['variables'][0])
     try:
         for meta in result['variables']:
-            # print(meta['id'])
             table_field_types.append(meta['id'])
-            # for val in meta["values"]:                
-            #     table_field_types.append(val)
     except:
         pass
-    # print(len(table_field_types))
-    # return table_field_types
+
     return result['variables'][int(f"{field_id}")]['values']
 
 def get_table_metadata_fields(table_name):
@@ -208,60 +165,20 @@ def get_table_metadata_fields(table_name):
     except:
         pass
     return table_fields
-# get_table_metadata()
 
-#TODO: Denne skal bruge args som nr 2 argument, hvori variables bor, json herunder skal skabes dynamisk...
 def get_table_data(payload):
-    # payload = {
-    #     "table": "SKIB74",
-    #     "format": "CSV",
-    #     "variables": [
-    #         {
-    #             "code": "LANDGRP",
-    #             "values": [
-    #             "00"
-    #             ]
-    #         },
-    #         {
-    #             "code": "GODS",
-    #             "values": [
-    #             "100"
-    #             ]
-    #         },
-    #         {
-    #             "code": "Tid",
-    #             "values": [
-    #             "2000K1"
-    #             ]
-    #         }
-    #     ]
-    # }
 
     print("running get_table_data")
     result = requests.post('https://api.statbank.dk/v1/data/', json=payload) #CSV?delimiter=Semicolon
     print('result:',result)
     result = result.text
     print('result.text:',result)
-    
-
-    # url = "https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1"
-
-    #TODO: Byg url fra payload
-    #TODO: Fjern fil hvis den allerede eksisterer (overskrives ikke automatiskt...)
-    #csv_file = urllib.request.urlretrieve('https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1', "test.csv")
-
-    # print(result)
-    # filepath = 'test.csv'
-    # dataframe = pd.read_csv(filepath)
-    
-    # dataframe.columns
-    # print(dataframe.columns)
-    # dataframe
 
     return result
 
 # get_table_data()
 
+#Bruges ikke:
 def myPandas():
     csv_file = urllib.request.urlretrieve('https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1', "test.csv")
 
@@ -280,61 +197,3 @@ def myPandas():
     X = data[features]
     print(X.describe())
     print(X.head())
-
-
-    # le = preprocessing.LabelEncoder()
-    # X = le.fit_transform(X)
-    # print(X.head())
-
-    # model = DecisionTreeRegressor(random_state=1)
-
-    # model.fit(X, y)
-
-    # print(model.predict(X.head()))
-
-
-    # x = data['STATSB'].values.tolist()
-    # y = data['INDHOLD'].values.tolist()
-
-    # for index,item in enumerate(y):
-    #     print(item)
-
-# myPandas()
-    
-        # y[index] = float(y[index].replace(',','.'))
-    # print('x: ',x)
-    # print('y: ',y)
-
-    # plt.barh(x, y,color='#0000FF',label='Gennemsnitsalder')
-    # plt.xlabel('x-akse', fontsize='small') #hvorfor virker fontsize ikke? tjek version af pyplot...
-    # plt.xticks(rotation=90)
-    # plt.title('Mit diagram')
-    # plt.legend()
-    # plt.show()
-
-
-    # dataframe.columns
-    # print(dataframe.columns)
-
-# http://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=*&K%C3%98N=*&ALDER=*&STATSB=*&Tid=*
-# https://api.statbank.dk/v1/data/folk1b/CSV?delimiter=Semicolon&OMR%C3%85DE=101&K%C3%98N=1&ALDER=*&STATSB=*&Tid=2023K1
-
-    # payload = {
-    #     "table": f"{table_name}",
-    #     "format": "CSV",
-    #     "variables": [
-    #         {
-    #             "code": "BRANCHE07",
-    #             "values": ["CG"]
-    #         },
-    #         {
-    #             "code": "OMSTYPE",
-    #             "values": ["SAMLET"]
-    #         },
-    #         {
-    #             "code": "Tid",
-    #             "values": ["*"]
-    #         }
-    #     ],
-
-    # }
